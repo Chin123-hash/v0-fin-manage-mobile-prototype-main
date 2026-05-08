@@ -260,4 +260,9 @@ export const appState = {
   isGroupSavingActive: false,
   groupPocketBalance: 8500.0,
   targetAmount: 10000.0,
+  activePlan: {
+    microSavingAmount: 10,
+    autoSaveAmount: 10,
+    autoSaveTrigger: 100,
+  }
 };
