@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions, Alert } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { 
   useAnimatedStyle, 
@@ -15,24 +15,27 @@ export function DraggablePet() {
   const pathname = usePathname();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   
-  // Hide the floating fish in screens where the sanctuary or tank is already visible
-  if (pathname === '/fin-manage' || pathname === '/pet-hub') {
-    return null;
-  }
-
   const translateX = useSharedValue(windowWidth - 100);
   const translateY = useSharedValue(windowHeight - 200);
   const context = useSharedValue({ x: 0, y: 0 });
   const isPressed = useSharedValue(false);
 
-  // Gesture to go to the Pet Hub when clicked
+  // CRITICAL FIX: Added .runOnJS(true) so navigation happens on the JS thread
   const tapGesture = Gesture.Tap()
+    .runOnJS(true) 
     .onEnd(() => {
-      router.push('/pet-hub');
+      console.log("👉 Pet clicked! Path:", pathname);
+      try {
+        console.log("🚀 Attempting push to /pet-hub");
+        router.push('/pet-hub');
+      } catch (error) {
+        console.error("❌ Navigation Error detail:", error);
+        Alert.alert("Navigation Failed", "Could not find /pet-hub route.");
+      }
     });
 
-  // Gesture to drag the pet around
   const panGesture = Gesture.Pan()
+    .runOnJS(true) // Running movement on JS thread for consistent logging
     .onBegin(() => {
       isPressed.value = true;
       context.value = { x: translateX.value, y: translateY.value };
@@ -43,7 +46,6 @@ export function DraggablePet() {
     })
     .onEnd(() => {
       isPressed.value = false;
-      
       const margin = 20;
       const rightBound = windowWidth - 90;
       const bottomBound = windowHeight - 150;
@@ -55,7 +57,6 @@ export function DraggablePet() {
       else if (translateY.value > bottomBound) translateY.value = withSpring(bottomBound);
     });
 
-  // panGesture and tapGesture are combined. Pan takes priority for movement.
   const composedGesture = Gesture.Exclusive(panGesture, tapGesture);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -68,6 +69,9 @@ export function DraggablePet() {
       opacity: withTiming(isPressed.value ? 0.9 : 1),
     };
   });
+
+  const isVisible = pathname !== '/fin-manage' && pathname !== '/pet-hub';
+  if (!isVisible) return null;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
