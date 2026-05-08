@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, useWindowDimensions, Alert } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { 
   useAnimatedStyle, 
   useSharedValue, 
-  withSpring,
+  withSpring, 
   withTiming 
 } from 'react-native-reanimated';
 import { useRouter, usePathname } from 'expo-router';
@@ -20,22 +20,13 @@ export function DraggablePet() {
   const context = useSharedValue({ x: 0, y: 0 });
   const isPressed = useSharedValue(false);
 
-  // CRITICAL FIX: Added .runOnJS(true) so navigation happens on the JS thread
   const tapGesture = Gesture.Tap()
-    .runOnJS(true) 
+    .runOnJS(true)
     .onEnd(() => {
-      console.log("👉 Pet clicked! Path:", pathname);
-      try {
-        console.log("🚀 Attempting push to /pet-hub");
-        router.push('/pet-hub');
-      } catch (error) {
-        console.error("❌ Navigation Error detail:", error);
-        Alert.alert("Navigation Failed", "Could not find /pet-hub route.");
-      }
+      router.push('/pet-hub');
     });
 
   const panGesture = Gesture.Pan()
-    .runOnJS(true) // Running movement on JS thread for consistent logging
     .onBegin(() => {
       isPressed.value = true;
       context.value = { x: translateX.value, y: translateY.value };
@@ -59,19 +50,19 @@ export function DraggablePet() {
 
   const composedGesture = Gesture.Exclusive(panGesture, tapGesture);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-        { scale: withTiming(isPressed.value ? 1.2 : 1) },
-      ],
-      opacity: withTiming(isPressed.value ? 0.9 : 1),
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { scale: withTiming(isPressed.value ? 1.2 : 1) },
+    ],
+    opacity: withTiming(isPressed.value ? 0.9 : 1),
+  }));
 
-  const isVisible = pathname !== '/fin-manage' && pathname !== '/pet-hub';
-  if (!isVisible) return null;
+  // UPDATED: Hide on Fin-Manage, Pet-Hub, AND Profile (/me)
+  const isHidden = pathname === '/fin-manage' || pathname === '/pet-hub' || pathname === '/me';
+  
+  if (isHidden) return null;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
