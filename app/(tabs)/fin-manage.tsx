@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, Alert, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { DigitalTank } from "@/components/fin-manage/DigitalTank";
 import { SavingStreak } from "@/components/fin-manage/SavingStreak";
 import { YieldMaximizer } from "@/components/fin-manage/YieldMaximizer";
@@ -9,34 +9,22 @@ import { AIInsights } from "@/components/fin-manage/AIInsights";
 import { MentalAccounts } from "@/components/fin-manage/MentalAccounts";
 import { NudgeBanner } from "@/components/fin-manage/NudgeBanner";
 import { savingStats, appState } from "@/lib/mock-data";
-import { formatRM } from "@/lib/mock-data";
-import { colors } from "@/lib/constants";
-import { LinearGradient } from "expo-linear-gradient"; 
 import { GroupSavingCard } from "@/components/saving-plan/GroupSavingCard";
+import { ManageSavingPlan } from "@/components/fin-manage/ManageSavingPlan";
 
 export default function FinManageScreen() {
   const router = useRouter();
+
+  // Use state to track if the plan is active and current streak status
   const [isPlanActive, setIsPlanActive] = useState(appState.isGroupSavingActive);
   const [currentStreak, setCurrentStreak] = useState(savingStats.streak);
 
-  // Simulate breaking the streak
-  const handleTerminatePlan = () => {
-    Alert.alert(
-      "Terminate Plan?",
-      "Stopping micro-saves will break your personal AND group streak.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Terminate",
-          style: "destructive",
-          onPress: () => {
-            setCurrentStreak(0);
-            setIsPlanActive(false);
-            appState.isGroupSavingActive = false;
-          }
-        }
-      ]
-    );
+  // This function is passed to the ManageSavingPlan component to trigger UI updates
+  const refreshState = () => {
+    setIsPlanActive(appState.isGroupSavingActive);
+    if (!appState.isGroupSavingActive) {
+      setCurrentStreak(0); // Visually break the streak on termination
+    }
   };
 
   const handleSetupSavingPlan = () => {
@@ -66,19 +54,24 @@ export default function FinManageScreen() {
           </View>
         </View>
 
-        {/* Saving Streak Badge */}
+        {/* Saving Streak Badge - Updated to use currentStreak state */}
         <View className="mb-4">
-          <SavingStreak streak={savingStats.streak} />
+          <SavingStreak streak={currentStreak} />
         </View>
 
-        {/* CONDITION 1: Show Group Saving only if plan is active */}
+        {/* NEW: Plan Management - Allows users to change amounts or terminate */}
+        {isPlanActive && (
+          <ManageSavingPlan onUpdate={refreshState} />
+        )}
+
+        {/* Group Saving Challenge - Dashboard Version */}
         {isPlanActive && (
           <View className="mb-4">
             <GroupSavingCard isDashboardVersion={true} />
           </View>
         )}
 
-        {/* Yield Maximizer */}
+        {/* Yield Maximizer - Rate increases when plan is active */}
         <View className="mb-4">
           <YieldMaximizer
             currentSavings={savingStats.currentSavings}
@@ -90,10 +83,10 @@ export default function FinManageScreen() {
         <View className="mb-4">
           <AIInsights />
         </View>
-        
+
         <MentalAccounts />
-        
-        {/* CONDITION 2: Show Nudge Banner ONLY if plan is NOT active */}
+
+        {/* Nudge Banner - Only visible when no plan is active */}
         {!isPlanActive && (
           <View className="mt-2 mb-4">
             <NudgeBanner onPress={handleSetupSavingPlan} />

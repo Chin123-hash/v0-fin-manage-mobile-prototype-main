@@ -23,14 +23,16 @@ export default function SavingPlanScreen() {
   };
 
   const handleActivate = () => {
-    appState.isGroupSavingActive = true; // In a real app, use Context or Redux
-    Alert.alert(
-      "Saving Plan Activated!",
-      `Your GXBank save pocket is ready!\n\n- Daily micro-save: RM${selectedMicroAmount}\n- Group Challenge: Active`,
-      [
-        { text: "Awesome!", onPress: () => router.replace("/(tabs)/fin-manage") },
-      ]
-    );
+    appState.isGroupSavingActive = true;
+    appState.activePlan = {
+      microSavingAmount: selectedMicroAmount || 0,
+      autoSaveAmount: saveAmount,
+      autoSaveTrigger: triggerAmount,
+    };
+
+    Alert.alert("Plan Updated", "Your changes have been saved to your GXBank pocket.", [
+      { text: "Done", onPress: () => router.back() }
+    ]);
   };
 
   const handleJoinGroup = () => {
