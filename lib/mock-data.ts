@@ -257,6 +257,7 @@ export const groupRewards = [
 
 // Add a global-ish state for the prototype
 export const appState = {
+  isPersonalPlanActive: false,
   isGroupSavingActive: false,
   groupPocketBalance: 8500.0,
   targetAmount: 10000.0,

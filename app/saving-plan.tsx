@@ -1,3 +1,4 @@
+// app/saving-plan.tsx
 import React, { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,14 +7,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import { X, Check, Sparkles } from "lucide-react-native";
 import { MicroSavingChips } from "@/components/saving-plan/MicroSavingChips";
 import { FutureSavingLogic } from "@/components/saving-plan/FutureSavingLogic";
-import { GroupSavingCard } from "@/components/saving-plan/GroupSavingCard";
+// Removed GroupSavingCard import
 import { colors } from "@/lib/constants";
 import { appState } from "@/lib/mock-data";
 
 export default function SavingPlanScreen() {
   const router = useRouter();
 
-  // State for saving plan options
   const [selectedMicroAmount, setSelectedMicroAmount] = useState<number | null>(10);
   const [saveAmount, setSaveAmount] = useState(10);
   const [triggerAmount, setTriggerAmount] = useState(100);
@@ -23,28 +23,20 @@ export default function SavingPlanScreen() {
   };
 
   const handleActivate = () => {
-    appState.isGroupSavingActive = true;
+    appState.isPersonalPlanActive = true; // Set the personal flag
     appState.activePlan = {
-      microSavingAmount: selectedMicroAmount || 0,
+      microSavingAmount: selectedMicroAmount || 10,
       autoSaveAmount: saveAmount,
       autoSaveTrigger: triggerAmount,
     };
 
-    Alert.alert("Plan Updated", "Your changes have been saved to your GXBank pocket.", [
-      { text: "Done", onPress: () => router.back() }
-    ]);
-  };
-
-  const handleJoinGroup = () => {
     Alert.alert(
-      "Join Group Challenge",
-      "You'll be joining the Japan Trip Squad! Save together and earn +0.5% p.a. bonus interest.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Join", onPress: () => {} },
-      ]
+      "Saving Plan Activated!",
+      "Your rewards are ready.",
+      [{ text: "Awesome!", onPress: () => router.back() }]
     );
   };
+  // Removed handleJoinGroup function
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top", "bottom"]}>
@@ -63,7 +55,6 @@ export default function SavingPlanScreen() {
             Setup Saving Plan
           </Text>
         </View>
-
         <View className="w-10" />
       </View>
 
@@ -72,7 +63,6 @@ export default function SavingPlanScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
       >
-        {/* Intro text */}
         <View className="mb-6">
           <Text className="text-foreground-muted text-center">
             Create smart saving habits with automated rules. Every small step
@@ -80,13 +70,11 @@ export default function SavingPlanScreen() {
           </Text>
         </View>
 
-        {/* Micro-Saving Chips */}
         <MicroSavingChips
           selectedAmount={selectedMicroAmount}
           onSelect={setSelectedMicroAmount}
         />
 
-        {/* Future Saving Logic */}
         <FutureSavingLogic
           saveAmount={saveAmount}
           triggerAmount={triggerAmount}
@@ -94,8 +82,7 @@ export default function SavingPlanScreen() {
           onTriggerAmountChange={setTriggerAmount}
         />
 
-        {/* Group Saving */}
-        <GroupSavingCard onJoin={handleJoinGroup} />
+        {/* Removed GroupSavingCard from here */}
 
         {/* Summary */}
         <View className="bg-background-card rounded-xl p-4 mb-4">

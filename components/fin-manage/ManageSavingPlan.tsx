@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { Settings2, Trash2, Zap } from "lucide-react-native";
 import { appState } from "@/lib/mock-data";
 import { useRouter } from "expo-router";
+import { colors } from "@/lib/constants";
 
 export function ManageSavingPlan({ onUpdate }: { onUpdate: () => void }) {
     const router = useRouter();
@@ -10,15 +11,15 @@ export function ManageSavingPlan({ onUpdate }: { onUpdate: () => void }) {
 
     const handleTerminate = () => {
         Alert.alert(
-            "Terminate Auto-Save?",
-            "Your streak will be reset and you will stop earning bonus interest.",
+            "Terminate Plan?",
+            "You will stop earning bonus interest and your streak will reset.",
             [
                 { text: "Cancel", style: "cancel" },
                 {
                     text: "Terminate",
                     style: "destructive",
                     onPress: () => {
-                        appState.isGroupSavingActive = false;
+                        appState.isPersonalPlanActive = false; // Deactivate personal plan
                         onUpdate();
                     }
                 }
@@ -30,13 +31,13 @@ export function ManageSavingPlan({ onUpdate }: { onUpdate: () => void }) {
         <View className="bg-background-card rounded-2xl p-4 mx-4 mb-4">
             <View className="flex-row items-center justify-between mb-4">
                 <View className="flex-row items-center">
-                    <View className="w-10 h-10 rounded-full bg-accent-teal/20 items-center justify-center mr-3">
-                        <Settings2 size={20} color="#00f5d4" />
+                    <View className="w-10 h-10 rounded-full bg-accent/20 items-center justify-center mr-3">
+                        <Settings2 size={20} color={colors.accent.teal} />
                     </View>
-                    <Text className="text-foreground font-bold text-base">Manage Active Plan</Text>
+                    <Text className="text-foreground font-bold text-base">Active Saving Plan</Text>
                 </View>
                 <TouchableOpacity onPress={handleTerminate}>
-                    <Trash2 size={20} color="#ff006e" />
+                    <Trash2 size={20} color={colors.accent.pink} />
                 </TouchableOpacity>
             </View>
 
@@ -50,22 +51,22 @@ export function ManageSavingPlan({ onUpdate }: { onUpdate: () => void }) {
                         onPress={() => router.push("/saving-plan")}
                         className="bg-background-card px-3 py-1.5 rounded-lg"
                     >
-                        <Text className="text-accent text-xs font-bold">Change</Text>
+                        <Text className="text-accent text-xs font-bold">Edit</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View className="h-[1px] bg-background-card w-full" />
+                <View className="h-[0.5px] bg-foreground/10 w-full" />
 
                 <View className="flex-row justify-between items-center">
                     <View>
                         <Text className="text-foreground-muted text-xs">Smart Auto-Save</Text>
                         <Text className="text-foreground font-semibold">
-                            RM {autoSaveAmount} per RM {autoSaveTrigger}
+                            RM {autoSaveAmount} / RM {autoSaveTrigger}
                         </Text>
                     </View>
-                    <View className="flex-row items-center bg-accent-teal/10 px-2 py-1 rounded-md">
-                        <Zap size={12} color="#00f5d4" />
-                        <Text className="text-accent text-[10px] font-bold ml-1">ACTIVE</Text>
+                    <View className="flex-row items-center bg-accent/10 px-2 py-1 rounded-md">
+                        <Zap size={12} color={colors.accent.teal} />
+                        <Text className="text-accent text-[10px] font-bold ml-1">AUTO</Text>
                     </View>
                 </View>
             </View>

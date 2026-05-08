@@ -10,7 +10,7 @@ interface GroupSavingCardProps {
   isDashboardVersion?: boolean;
 }
 
-export function GroupSavingCard({ onJoin, isDashboardVersion = false }: GroupSavingCardProps) {
+export function GroupSavingCard({ onJoin }: GroupSavingCardProps) {
   const [showContacts, setShowContacts] = useState(false);
   const [balance, setBalance] = useState(appState.groupPocketBalance);
   const progress = (balance / appState.targetAmount) * 100; 
@@ -28,8 +28,8 @@ export function GroupSavingCard({ onJoin, isDashboardVersion = false }: GroupSav
   };
 
   return (
-    <View className="mb-6">
-      <View className="flex-row items-center mb-4 px-4">
+    <View className="mb-6"> {/* Keeps consistent spacing from the component below */}
+      <View className="flex-row items-center mb-4">
         <View className="w-10 h-10 rounded-full bg-[#ff006e]/20 items-center justify-center mr-3">
           <Users size={20} color="#ff006e" />
         </View>
@@ -38,7 +38,7 @@ export function GroupSavingCard({ onJoin, isDashboardVersion = false }: GroupSav
             Group Saving Challenge
           </Text>
           <Text className="text-foreground-muted text-sm">
-            {isDashboardVersion ? "Saving for Japan Trip Squad" : "Save together with friends"}
+            Saving for Japan Trip Squad
           </Text>
         </View>
       </View>
@@ -89,19 +89,9 @@ export function GroupSavingCard({ onJoin, isDashboardVersion = false }: GroupSav
             </TouchableOpacity>
           </View>
 
-          {isDashboardVersion ? (
-            <TouchableOpacity
-              onPress={handleAddMoney}
-              className="bg-accent-teal px-4 py-2 rounded-xl flex-row items-center"
-            >
-              <Wallet size={16} color="#1a0a2e" className="mr-2" />
-              <Text className="text-[#1a0a2e] font-bold">Add RM50</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={onJoin} className="bg-accent-pink px-6 py-2 rounded-xl">
-              <Text className="text-white font-bold">Join Group</Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={onJoin} className="bg-accent-pink px-6 py-2 rounded-xl">
+            <Text className="text-white font-bold">Join Group</Text>
+          </TouchableOpacity>
         </View>
       </LinearGradient>
 
