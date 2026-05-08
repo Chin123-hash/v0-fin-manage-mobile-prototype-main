@@ -236,3 +236,28 @@ export function formatRM(amount: number): string {
 export function calculateProgress(current: number, target: number): number {
   return Math.min((current / target) * 100, 100);
 }
+
+export interface Contact {
+  id: string;
+  name: string;
+  phone: string;
+}
+
+export const fakeContacts: Contact[] = [
+  { id: '1', name: 'Anis Najwa', phone: '012-3456789' },
+  { id: '2', name: 'Aina Tasnim', phone: '011-9876543' },
+  { id: '3', name: 'Mei Ling', phone: '017-2233445' },
+  { id: '4', name: 'Raj', phone: '019-5566778' },
+];
+
+export const groupRewards = [
+  { target: 10000, reward: "Special Gold Fin for Kira", type: "decoration" },
+  { target: 15000, reward: "+0.5% p.a. Interest Bonus", type: "interest" },
+];
+
+// Add a global-ish state for the prototype
+export const appState = {
+  isGroupSavingActive: false,
+  groupPocketBalance: 8500.0,
+  targetAmount: 10000.0,
+};

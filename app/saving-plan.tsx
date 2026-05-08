@@ -8,6 +8,7 @@ import { MicroSavingChips } from "@/components/saving-plan/MicroSavingChips";
 import { FutureSavingLogic } from "@/components/saving-plan/FutureSavingLogic";
 import { GroupSavingCard } from "@/components/saving-plan/GroupSavingCard";
 import { colors } from "@/lib/constants";
+import { appState } from "@/lib/mock-data";
 
 export default function SavingPlanScreen() {
   const router = useRouter();
@@ -22,14 +23,12 @@ export default function SavingPlanScreen() {
   };
 
   const handleActivate = () => {
+    appState.isGroupSavingActive = true; // In a real app, use Context or Redux
     Alert.alert(
       "Saving Plan Activated!",
-      `Your smart saving rules are now active:\n\n- Micro-save: RM${selectedMicroAmount || 0}/day\n- Auto-save: RM${saveAmount} per RM${triggerAmount} deposit`,
+      `Your GXBank save pocket is ready!\n\n- Daily micro-save: RM${selectedMicroAmount}\n- Group Challenge: Active`,
       [
-        {
-          text: "Awesome!",
-          onPress: handleClose,
-        },
+        { text: "Awesome!", onPress: () => router.replace("/(tabs)/fin-manage") },
       ]
     );
   };
