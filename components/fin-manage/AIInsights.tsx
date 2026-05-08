@@ -55,8 +55,8 @@ export function AIInsights() {
       {/* Header */}
       <View className="flex-row items-center justify-between mb-4">
         <View className="flex-row items-center">
-          <View className="w-10 h-10 rounded-full bg-purple-500/20 items-center justify-center mr-3">
-            <Sparkles size={20} color="#9d4edd" />
+          <View className="w-10 h-10 rounded-full bg-accent-purple/20 items-center justify-center mr-3">
+            <Sparkles size={20} color={colors.accent.purple} />
           </View>
           <View>
             <Text className="text-foreground font-bold text-base">AI Spending Insights</Text>
@@ -133,7 +133,10 @@ export function AIInsights() {
       {/* Legend */}
       <View className="flex-row justify-center gap-6 mb-4">
         <View className="flex-row items-center">
-          <View className="w-4 h-1 bg-pink rounded mr-2" />
+          <View 
+            className="w-4 h-1 rounded mr-2" 
+            style={{ backgroundColor: colors.accent.pink }} 
+          />
           <Text className="text-foreground-muted text-xs">Actual Spending</Text>
         </View>
         <View className="flex-row items-center">

@@ -12,35 +12,17 @@ export function SavingStreak({ streak }: SavingStreakProps) {
   const glowAnim = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
-    // Pulsing animation for the flame
     const pulseAnimation = Animated.loop(
       Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 1.1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
+        Animated.timing(scaleAnim, { toValue: 1.1, duration: 800, useNativeDriver: true }),
+        Animated.timing(scaleAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
       ])
     );
 
-    // Glow animation
     const glowAnimation = Animated.loop(
       Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0.5,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
+        Animated.timing(glowAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+        Animated.timing(glowAnim, { toValue: 0.5, duration: 1000, useNativeDriver: true }),
       ])
     );
 
@@ -55,8 +37,8 @@ export function SavingStreak({ streak }: SavingStreakProps) {
 
   return (
     <View className="flex-row items-center bg-background-card rounded-2xl p-4 mx-4">
-      {/* Flame icon with glow */}
-      <View className="relative">
+      {/* Flame icon with glow (Centered safely) */}
+      <View className="w-12 h-12 items-center justify-center">
         <Animated.View
           style={{
             position: "absolute",
@@ -69,8 +51,11 @@ export function SavingStreak({ streak }: SavingStreakProps) {
           }}
         />
         <Animated.View
-          className="w-12 h-12 rounded-full bg-pink items-center justify-center"
-          style={{ transform: [{ scale: scaleAnim }] }}
+          className="w-12 h-12 rounded-full absolute items-center justify-center"
+          style={{ 
+            backgroundColor: colors.accent.pink,
+            transform: [{ scale: scaleAnim }] 
+          }}
         >
           <Flame size={24} color="#ffffff" fill="#ffffff" />
         </Animated.View>
@@ -81,14 +66,14 @@ export function SavingStreak({ streak }: SavingStreakProps) {
         <Text className="text-foreground text-lg font-bold">
           {streak}-Day Saving Streak!
         </Text>
-        <Text className="text-foreground-muted text-sm">
+        <Text className="text-foreground-muted text-xs mt-0.5">
           Keep it up! 5 more days for a bonus reward
         </Text>
       </View>
 
       {/* Streak count badge */}
-      <View className="bg-pink/20 rounded-full px-3 py-1">
-        <Text className="text-pink font-bold text-lg">{streak}</Text>
+      <View className="bg-accent-pink/20 rounded-full px-3 py-1">
+        <Text className="text-accent-pink font-bold text-lg">{streak}</Text>
       </View>
     </View>
   );

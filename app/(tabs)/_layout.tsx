@@ -11,16 +11,17 @@ interface TabIconProps {
 
 function TabIcon({ focused, Icon, label }: TabIconProps) {
   return (
-    <View className="items-center justify-center pt-2">
+    <View className="items-center justify-center w-16 pt-1">
       <Icon
         size={24}
         color={focused ? colors.accent.teal : colors.text.muted}
         strokeWidth={focused ? 2.5 : 2}
       />
       <Text
-        className={`text-xs mt-1 ${
+        className={`text-[10px] mt-1 ${
           focused ? "text-accent font-semibold" : "text-foreground-muted"
         }`}
+        numberOfLines={1}
       >
         {label}
       </Text>
@@ -37,7 +38,7 @@ export default function TabLayout() {
           backgroundColor: colors.background.secondary,
           borderTopColor: colors.background.card,
           borderTopWidth: 1,
-          height: 80,
+          minHeight: 65, 
           paddingBottom: 8,
           paddingTop: 8,
         },

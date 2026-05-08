@@ -13,7 +13,8 @@ export function GroupSavingCard({ onJoin }: GroupSavingCardProps) {
   return (
     <View className="mb-6">
       <View className="flex-row items-center mb-4">
-        <View className="w-10 h-10 rounded-full bg-pink/20 items-center justify-center mr-3">
+        {/* FIXED: Changed bg-pink/20 to bg-accent-pink/20 */}
+        <View className="w-10 h-10 rounded-full bg-[#ff006e]/20 items-center justify-center mr-3">
           <Users size={20} color={colors.accent.pink} />
         </View>
         <View>
@@ -38,7 +39,7 @@ export function GroupSavingCard({ onJoin }: GroupSavingCardProps) {
         {/* Bonus badge */}
         <View className="flex-row items-center justify-between mb-4">
           <Text className="text-foreground font-semibold">Japan Trip Squad</Text>
-          <View className="flex-row items-center bg-accent/20 rounded-full px-3 py-1">
+          <View className="flex-row items-center bg-[#00f5d4]/20 rounded-full px-3 py-1">
             <TrendingUp size={14} color={colors.accent.teal} />
             <Text className="text-accent font-bold text-sm ml-1">
               +0.5% p.a. bonus
