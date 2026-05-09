@@ -5,12 +5,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ChevronLeft, Fish, Send } from "lucide-react-native";
 import { colors } from "@/lib/constants";
-import { groupMembers } from "@/lib/mock-data";
+import { appState, groupMembers } from "@/lib/mock-data";
 
 export default function GroupChatScreen() {
   const router = useRouter();
   const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
   const [message, setMessage] = useState("");
+  const group = appState.groups.find(g => g.id === id);
+  const memberCount = group ? group.members.length + 1 : 1;
 
   const messages = [
     { id: "1", sender: "Aisyah", text: "Saved RM10 today! 🚀", time: "10:30 AM", isMe: false },
@@ -23,7 +25,8 @@ export default function GroupChatScreen() {
         <TouchableOpacity onPress={() => router.back()}><ChevronLeft size={24} color={colors.text.primary} /></TouchableOpacity>
         <TouchableOpacity onPress={() => router.push(`/group-details/${id}`)} className="flex-1 items-center">
           <Text className="text-foreground font-bold text-lg">{name}</Text>
-          <Text className="text-foreground-muted text-[10px]">{groupMembers.length} Members</Text>
+          {/* FIX: Show the correct member count for this group */}
+          <Text className="text-foreground-muted text-[10px]">{memberCount} Members</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push(`/group-tank/${id}`)} className="w-10 h-10 rounded-full bg-accent/10 items-center justify-center border border-accent/20">
           <Fish size={22} color={colors.accent.teal} />

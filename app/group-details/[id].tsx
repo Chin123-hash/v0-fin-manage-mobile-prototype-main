@@ -72,7 +72,8 @@ export default function GroupDetailsScreen() {
                                 <Text className="text-foreground font-semibold">{member.name}</Text>
                                 <View className="flex-row items-center">
                                     <Phone size={10} color={colors.text.muted} />
-                                    <Text className="text-foreground-muted text-xs ml-1">{member.initials}</Text>
+                                    {/* FIX: Display actual phone instead of initials */}
+                                    <Text className="text-foreground-muted text-xs ml-1">{member.phone}</Text>
                                 </View>
                             </View>
                             <View className="bg-accent/10 px-2 py-0.5 rounded-md">

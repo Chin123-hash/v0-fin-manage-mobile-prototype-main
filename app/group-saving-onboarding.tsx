@@ -33,7 +33,6 @@ export default function GroupSavingOnboardingScreen() {
     const handleComplete = () => {
         const finalName = groupName.trim() || (appState.groups.length === 0 ? "Japan Trip Squad" : "Gaming Fund");
 
-        // Map selected IDs back to full contact objects
         const invitedMembers = fakeContacts.filter(c => selectedContacts.includes(c.id));
 
         const newGroup: GroupInstance = {
@@ -44,21 +43,13 @@ export default function GroupSavingOnboardingScreen() {
                 id: c.id,
                 name: c.name,
                 initials: c.name[0],
-                color: colors.accent.pink
+                color: colors.accent.pink,
+                phone: c.phone // Capture the phone number here
             })),
-            messages: [],
-            rewards: [],
-            missions: [],
-            achievements: [],
-            leaderboard: [],
-            notifications: [],
-            settings: [],
-            pocketBalance: 0,
         };
 
         appState.groups.push(newGroup);
         appState.isGroupSavingActive = true;
-
         router.replace("/(tabs)/fin-manage");
     };
 
