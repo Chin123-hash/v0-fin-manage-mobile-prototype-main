@@ -18,7 +18,6 @@ export default function FinManageScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const [isPlanActive, setIsPlanActive] = useState(appState.isPersonalPlanActive);
   const [currentStreak, setCurrentStreak] = useState(savingStats.streak);
-  const [isGroupActive, setIsGroupActive] = useState(appState.isGroupSavingActive);
 
   // This hook runs every time you navigate TO this screen
   useFocusEffect(
@@ -29,7 +28,6 @@ export default function FinManageScreen() {
       // Sync local state with global flag
       setIsPlanActive(currentlyActive);
       setCurrentStreak(currentlyActive ? savingStats.streak : 0);
-      setIsGroupActive(appState.isGroupSavingActive);
 
       // Refresh to top only if the plan was just activated
       if (!previouslyActive && currentlyActive) {
@@ -40,7 +38,6 @@ export default function FinManageScreen() {
 
   const refreshState = () => {
     setIsPlanActive(appState.isPersonalPlanActive);
-    setIsGroupActive(appState.isGroupSavingActive); // Update group state too
     if (!appState.isPersonalPlanActive) setCurrentStreak(0);
   };
 
@@ -81,10 +78,7 @@ export default function FinManageScreen() {
         {isPlanActive && (
           <View className="px-4 mb-4">
             {/* Group Saving Card: Independent joined state */}
-            <GroupSavingCard
-              isJoined={isGroupActive}
-              onJoinSuccess={refreshState}
-            />
+            <GroupSavingCard />
           </View>
         )}
 

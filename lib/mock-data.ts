@@ -255,10 +255,17 @@ export const groupRewards = [
   { target: 15000, reward: "+0.5% p.a. Interest Bonus", type: "interest" },
 ];
 
+export interface GroupInstance {
+  id: string;
+  name: string;
+  balance: number;
+}
+
 // Add a global-ish state for the prototype
 export const appState = {
   isPersonalPlanActive: false,
-  isGroupSavingActive: false,
+  isGroupSavingActive: false, // Kept for legacy compatibility
+  groups: [] as GroupInstance[], // Array to track up to 2 groups
   groupPocketBalance: 0.0,
   targetAmount: 10000.0,
   activePlan: {
@@ -267,3 +274,5 @@ export const appState = {
     autoSaveTrigger: 100,
   }
 };
+
+
