@@ -23,7 +23,8 @@ export default function SavingPlanScreen() {
   };
 
   const handleActivate = () => {
-    appState.isPersonalPlanActive = true; // Set the personal flag
+    // Update the personal plan flag
+    appState.isPersonalPlanActive = true;
     appState.activePlan = {
       microSavingAmount: selectedMicroAmount || 10,
       autoSaveAmount: saveAmount,
@@ -32,8 +33,13 @@ export default function SavingPlanScreen() {
 
     Alert.alert(
       "Saving Plan Activated!",
-      "Your rewards are ready.",
-      [{ text: "Awesome!", onPress: () => router.back() }]
+      "Your rewards are ready. Check your dashboard!",
+      [
+        {
+          text: "Awesome!",
+          onPress: () => router.back(), // Navigates back to trigger refresh logic
+        },
+      ]
     );
   };
   // Removed handleJoinGroup function

@@ -1,5 +1,5 @@
 // app/(tabs)/fin-manage.tsx
-import React, { useCallback, useState} from "react";
+import React, { useCallback, useState, useRef} from "react";
 import { View, Text, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -15,41 +15,43 @@ import { appState, savingStats } from "@/lib/mock-data";
 
 export default function FinManageScreen() {
   const router = useRouter();
+  const scrollRef = useRef<ScrollView>(null);
   const [isPlanActive, setIsPlanActive] = useState(appState.isPersonalPlanActive);
   const [currentStreak, setCurrentStreak] = useState(savingStats.streak);
+  const [isGroupActive, setIsGroupActive] = useState(appState.isGroupSavingActive);
 
   // This hook runs every time you navigate TO this screen
   useFocusEffect(
     useCallback(() => {
+      const previouslyActive = isPlanActive;
+      const currentlyActive = appState.isPersonalPlanActive;
+
       // Sync local state with global flag
-      setIsPlanActive(appState.isPersonalPlanActive);
-      setCurrentStreak(appState.isPersonalPlanActive ? savingStats.streak : 0);
-    }, [])
+      setIsPlanActive(currentlyActive);
+      setCurrentStreak(currentlyActive ? savingStats.streak : 0);
+      setIsGroupActive(appState.isGroupSavingActive);
+
+      // Refresh to top only if the plan was just activated
+      if (!previouslyActive && currentlyActive) {
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+      }
+    }, [isPlanActive])
   );
 
   const refreshState = () => {
     setIsPlanActive(appState.isPersonalPlanActive);
+    setIsGroupActive(appState.isGroupSavingActive); // Update group state too
     if (!appState.isPersonalPlanActive) setCurrentStreak(0);
   };
 
-  const handleSetupSavingPlan = () => {
-    router.push("/saving-plan");
-  };
-
-  const handleJoinGroup = () => {
-    Alert.alert(
-      "Join Group Challenge",
-      "You'll be joining the Japan Trip Squad! Save together and earn +0.5% p.a. bonus interest.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Join", onPress: () => Alert.alert("Success!", "You have joined the squad.") },
-      ]
-    );
+  const handleRefresh = () => {
+    refreshState();
   };
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top", "bottom"]}>
       <ScrollView
+        ref={scrollRef} // Attach scroll reference
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 24 }}
@@ -72,15 +74,19 @@ export default function FinManageScreen() {
           <SavingStreak streak={currentStreak} />
         </View>
 
-        {/* CONDITION 1: Replace Nudge Banner with Editor when plan is active */}
-        {isPlanActive && (
-          <ManageSavingPlan onUpdate={refreshState} />
-        )}
+        {/* 1. Show Editor when active (replaces NudgeBanner) */}
+        {isPlanActive && <ManageSavingPlan onUpdate={handleRefresh} />}
 
-        {/* Group Saving Card remains independent */}
-        <View className="px-4">
-          <GroupSavingCard onJoin={handleJoinGroup} />
-        </View>
+        {/* 2. Group Saving: Hidden until plan is active */}
+        {isPlanActive && (
+          <View className="px-4 mb-4">
+            {/* Group Saving Card: Independent joined state */}
+            <GroupSavingCard
+              isJoined={isGroupActive}
+              onJoinSuccess={refreshState}
+            />
+          </View>
+        )}
 
         <View className="mb-4">
           <YieldMaximizer
@@ -95,10 +101,10 @@ export default function FinManageScreen() {
 
         <MentalAccounts />
 
-        {/* CONDITION 2: Only show Nudge Banner if NO personal plan is active */}
+        {/* 3. Nudge Banner: Visible only if no plan is active */}
         {!isPlanActive && (
           <View className="mt-2 mb-4">
-            <NudgeBanner onPress={handleSetupSavingPlan} />
+            <NudgeBanner onPress={() => router.push("/saving-plan")} />
           </View>
         )}
       </ScrollView>

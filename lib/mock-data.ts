@@ -259,7 +259,7 @@ export const groupRewards = [
 export const appState = {
   isPersonalPlanActive: false,
   isGroupSavingActive: false,
-  groupPocketBalance: 8500.0,
+  groupPocketBalance: 0.0,
   targetAmount: 10000.0,
   activePlan: {
     microSavingAmount: 10,
