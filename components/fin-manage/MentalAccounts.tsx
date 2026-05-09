@@ -147,11 +147,22 @@ export function MentalAccounts({ accounts, onAddAccount, onDeleteAccount }: Ment
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingLeft: 16, paddingRight: 4 }}
+        contentContainerStyle={{ paddingLeft: 24, paddingRight: 12 }}
       >
         {accounts.map((account) => (
           <MentalAccountCard key={account.id} account={account} onDelete={onDeleteAccount} />
         ))}
+        
+        {/* Add New Account Button - Encouraging user action */}
+        <TouchableOpacity 
+          className="w-40 bg-background-card rounded-[24px] p-4 items-center justify-center border border-dashed border-accent/30"
+          activeOpacity={0.7}
+        >
+          <View className="w-10 h-10 rounded-full bg-accent/10 items-center justify-center mb-2">
+            <PlusCircle size={24} color={colors.accent.teal} />
+          </View>
+          <Text className="text-foreground text-xs font-bold">New Account</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );

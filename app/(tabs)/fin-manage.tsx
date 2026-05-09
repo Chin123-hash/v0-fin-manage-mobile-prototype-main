@@ -377,6 +377,11 @@ export default function FinManageScreen() {
     GoalTimeline: <GoalTimeline key="timeline" />,
   };
 
+  // Added navigation function to Pet Hub (Sanctuary)
+  const handleNavigateToPetHub = () => {
+    router.push("/pet-hub");
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       
