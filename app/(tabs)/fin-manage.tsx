@@ -13,14 +13,21 @@ import { NudgeBanner } from "@/components/fin-manage/NudgeBanner";
 import { KoiFish } from "@/components/fin-manage/KoiFish";
 
 // 导入 mock 数据和类型
-import { savingStats, quizQuestions, personaConfigs, PersonaType, type MentalAccount } from "@/lib/mock-data";
+import { 
+  savingStats, 
+  quizQuestions, 
+  personaConfigs, 
+  PersonaType, 
+  type MentalAccount,
+  appState // 🔥 导入全局状态
+} from "@/lib/mock-data";
 
 // ==========================================
 // ✨ 精装修版主页组件 (Decorated Dashboard Widgets)
 // ==========================================
 
 const MicroSavings = () => (
-  <View className="mb-4 mx-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
+  <View className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
     <View className="flex-row justify-between items-center mb-4">
       <View>
         <Text className="text-foreground font-bold text-lg">Micro Savings</Text>
@@ -33,18 +40,18 @@ const MicroSavings = () => (
     <View className="bg-background rounded-2xl p-4 mb-4 flex-row justify-between items-center border border-border/50">
        <View>
          <Text className="text-foreground font-semibold">Artisan Coffee</Text>
-         <Text className="text-accent font-bold text-sm mt-1">Save $15.00</Text>
+         <Text className="text-accent font-bold text-sm mt-1">Save RM15.00</Text>
        </View>
-       <Text className="text-foreground-muted text-sm line-through">$15.00</Text>
+       <Text className="text-foreground-muted text-sm line-through">RM15.00</Text>
     </View>
     <TouchableOpacity className="bg-accent w-full py-3.5 rounded-xl items-center shadow-sm">
-      <Text className="text-white font-bold text-sm">Save $15 to Vault Now</Text>
+      <Text className="text-white font-bold text-sm">Save RM15 to Vault Now</Text>
     </TouchableOpacity>
   </View>
 );
 
 const GroupSavings = () => (
-  <View className="mb-4 mx-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
+  <View className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
      <View className="flex-row justify-between items-center mb-4">
         <Text className="text-foreground font-bold text-lg">Group Savings</Text>
         <TouchableOpacity>
@@ -55,9 +62,9 @@ const GroupSavings = () => (
         <View className="flex-row justify-between items-end mb-3">
            <View>
              <Text className="text-foreground-muted text-xs font-medium uppercase tracking-wider">Family Fund</Text>
-             <Text className="text-foreground font-bold text-2xl mt-1">$1,250</Text>
+             <Text className="text-foreground font-bold text-2xl mt-1">RM1,250</Text>
            </View>
-           <Text className="text-foreground-muted text-xs mb-1 font-medium">Target: $5,000</Text>
+           <Text className="text-foreground-muted text-xs mb-1 font-medium">Target: RM5,000</Text>
         </View>
         <View className="h-2.5 w-full bg-border/40 rounded-full overflow-hidden mb-5">
           <View className="h-full bg-accent" style={{ width: '25%' }} />
@@ -77,7 +84,7 @@ const GroupSavings = () => (
 );
 
 const ExpenseRadar = () => (
-  <View className="mb-4 mx-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
+  <View className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
      <View className="flex-row justify-between items-center mb-4">
         <Text className="text-foreground font-bold text-lg">Expense Radar</Text>
         <View className="bg-red-500/10 px-2.5 py-1 rounded-md border border-red-500/20">
@@ -93,15 +100,15 @@ const ExpenseRadar = () => (
           <View className="h-full bg-red-500 rounded-full" style={{ width: '90%' }} />
         </View>
         <View className="flex-row justify-between">
-           <Text className="text-foreground-muted text-xs font-medium">$900 Spent</Text>
-           <Text className="text-foreground-muted text-xs font-medium">$1,000 Limit</Text>
+           <Text className="text-foreground-muted text-xs font-medium">RM900 Spent</Text>
+           <Text className="text-foreground-muted text-xs font-medium">RM1,000 Limit</Text>
         </View>
      </View>
   </View>
 );
 
 const GoalTimeline = () => (
-  <View className="mb-4 mx-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
+  <View className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
      <View className="flex-row justify-between items-center mb-4">
         <Text className="text-foreground font-bold text-lg">Goal Timeline</Text>
         <Text className="text-foreground-muted text-xs">Based on current rate</Text>
@@ -145,15 +152,13 @@ export default function FinManageScreen() {
   // 状态管理
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
-  const [userPersona, setUserPersona] = useState<PersonaType | null>(null);
+  const [userPersona, setUserPersona] = useState<PersonaType | null>(appState.userPersona);
   const [isEditing, setIsEditing] = useState(false);
-  const [activeLayout, setActiveLayout] = useState<string[]>([]);
+  const [activeLayout, setActiveLayout] = useState<string[]>(userPersona ? personaConfigs[userPersona].defaultLayout : []);
   const [showResultModal, setShowResultModal] = useState(false);
-  
-  // 🔥 新增：Mental Accounts 状态管理
   const [mentalAccounts, setMentalAccounts] = useState<MentalAccount[]>([]);
 
-  // 处理问卷答题逻辑
+  // 🔥 处理问卷答题逻辑
   const handleAnswer = (tags: string[], points: number) => {
     const newScores = { ...scores };
     tags.forEach(tag => {
@@ -172,54 +177,44 @@ export default function FinManageScreen() {
           topPersona = key as PersonaType;
         }
       });
+
+      // 🔥 更新全局状态
+      appState.userPersona = topPersona;
+      appState.hasFinishedQuiz = true;
+
       setUserPersona(topPersona);
       setActiveLayout(personaConfigs[topPersona].defaultLayout);
       
-      // 🔥 初始化：根据人格自动开通对应的 Mental Accounts
       if (personaConfigs[topPersona].defaultAccounts) {
         setMentalAccounts(personaConfigs[topPersona].defaultAccounts);
       }
       
-      setShowResultModal(true); // 显示领奖弹窗
+      setShowResultModal(true); 
     }
   };
 
-  // 🔥 处理 Mental Account 添加逻辑 (随机 Theme)
   const handleAddAccount = (name: string) => {
-    // 定义所有可选的主题（除了 neutral，让新账户看起来更丰富）
     const availableThemes: MentalAccount["theme"][] = ["travel", "shopping", "food", "emergency"];
-    
-    // 随机选择一个主题
     const randomTheme = availableThemes[Math.floor(Math.random() * availableThemes.length)];
-    
-    // 根据主题选择对应的图标
-    const iconMap: Record<string, string> = {
-      travel: "plane",
-      shopping: "shoe",
-      food: "utensils",
-      emergency: "shield",
-    };
+    const iconMap: Record<string, string> = { travel: "plane", shopping: "shoe", food: "utensils", emergency: "shield" };
   
     const newAcc: MentalAccount = {
       id: Date.now().toString(),
       name: name,
       balance: 0,
-      target: 1000, // 默认给个目标金额
+      target: 1000,
       theme: randomTheme,
       icon: iconMap[randomTheme] || "wallet",
       description: "New savings goal"
     };
-  
     setMentalAccounts([...mentalAccounts, newAcc]);
   };
 
-  // 🔥 处理 Mental Account 删除逻辑 (锁定 daily)
   const handleDeleteAccount = (id: string) => {
-    if (id === "daily") return; // 双重检查：Daily 不能删
+    if (id === "daily") return;
     setMentalAccounts(mentalAccounts.filter(a => a.id !== id));
   };
 
-  // 处理组件上下调换
   const moveWidget = (index: number, direction: 'up' | 'down') => {
     const newLayout = [...activeLayout];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -228,7 +223,6 @@ export default function FinManageScreen() {
     setActiveLayout(newLayout);
   };
 
-  // 处理组件添加/移除
   const toggleWidget = (widgetId: string) => {
     if (activeLayout.includes(widgetId)) {
       setActiveLayout(activeLayout.filter(id => id !== widgetId));
@@ -241,9 +235,11 @@ export default function FinManageScreen() {
     }
   };
 
-  // ==========================================
+  const handleNavigateToPetHub = () => {
+    router.push("/pet-hub");
+  };
+
   // 1. 问卷答题界面
-  // ==========================================
   if (!userPersona) {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     return (
@@ -266,9 +262,7 @@ export default function FinManageScreen() {
 
   const config = personaConfigs[userPersona];
 
-  // ==========================================
   // 2. 编辑排版界面
-  // ==========================================
   if (isEditing) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
@@ -355,14 +349,10 @@ export default function FinManageScreen() {
     );
   }
 
-  // ==========================================
-  // 3. 主界面 (包含领奖弹窗和动态排版)
-  // ==========================================
   const widgetDictionary: Record<string, React.ReactNode> = {
     SavingStreak: <View className="mb-4" key="streak"><SavingStreak streak={savingStats.streak} /></View>,
     YieldMaximizer: <View className="mb-4" key="yield"><YieldMaximizer currentSavings={savingStats.currentSavings} currentRate={savingStats.interestRate} /></View>,
     AIInsights: <View className="mb-4" key="ai"><AIInsights /></View>,
-    // 🔥 更新：MentalAccounts 现在接收动态 state 和方法
     MentalAccounts: (
       <MentalAccounts 
         key="mental"
@@ -377,56 +367,30 @@ export default function FinManageScreen() {
     GoalTimeline: <GoalTimeline key="timeline" />,
   };
 
-  // Added navigation function to Pet Hub (Sanctuary)
-  const handleNavigateToPetHub = () => {
-    router.push("/pet-hub");
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
-      
-      {/* 领奖 / 结果弹窗 */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={showResultModal}
-        onRequestClose={() => setShowResultModal(false)}
-      >
+      <Modal animationType="fade" transparent={true} visible={showResultModal} onRequestClose={() => setShowResultModal(false)}>
         <View className="flex-1 justify-center items-center px-6 bg-black/60">
           <View className="bg-background-card w-full rounded-[40px] p-8 border border-accent/20 items-center shadow-2xl">
-            <TouchableOpacity 
-              className="absolute top-6 right-6 p-2 z-10"
-              onPress={() => setShowResultModal(false)}
-            >
+            <TouchableOpacity className="absolute top-6 right-6 p-2 z-10" onPress={() => setShowResultModal(false)}>
               <Text className="text-foreground-muted text-xl font-bold">✕</Text>
             </TouchableOpacity>
-
             <Text className="text-accent font-bold uppercase tracking-widest text-xs mb-2 mt-2">Quiz Completed!</Text>
             <Text className="text-foreground font-bold text-2xl mb-6 text-center">Meet Your Financial Spirit Animal</Text>
-            
             <View className="w-48 h-48 bg-accent/5 rounded-full items-center justify-center mb-6 border border-accent/10">
                <KoiFish size={150} color={config.fishColor as any} />
             </View>
-
             <Text className="text-accent font-extrabold text-3xl mb-4 text-center">{config.name}</Text>
-            
             <View className="bg-background p-5 rounded-2xl border border-border mb-8 w-full">
-              <Text className="text-foreground-muted text-center leading-5 italic">
-                "{config.analysis || 'You have a unique approach to managing your finances!'}"
-              </Text>
+              <Text className="text-foreground-muted text-center leading-5 italic">"{config.analysis}"</Text>
             </View>
-
-            <TouchableOpacity 
-              className="bg-accent w-full py-4 rounded-2xl items-center shadow-lg"
-              onPress={() => setShowResultModal(false)}
-            >
+            <TouchableOpacity className="bg-accent w-full py-4 rounded-2xl items-center shadow-lg" onPress={() => setShowResultModal(false)}>
               <Text className="text-white font-bold text-lg">Awesome, let's go!</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      {/* 主页内容 */}
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View className="px-4 py-4 flex-row justify-between items-center">
           <View>
@@ -438,24 +402,29 @@ export default function FinManageScreen() {
           </TouchableOpacity>
         </View>
 
-        <View className="mx-4 mb-4">
+        {/* Interactive Dashboard Tank (Portal to Pet Hub) */}
+        <TouchableOpacity 
+          onPress={handleNavigateToPetHub}
+          activeOpacity={0.9}
+          className="mx-4 mb-4 shadow-xl shadow-black/40"
+        >
           <DigitalTank height={180} koiColor={config.fishColor} /> 
-          <View className="absolute bottom-2 left-2 bg-background/80 rounded-lg px-3 py-1">
-            <Text className="text-accent text-xs font-semibold">Kira the Koi</Text>
+          <View className="absolute bottom-2 left-2 bg-background/80 rounded-lg px-3 py-1 border border-accent/10">
+            <Text className="text-accent text-xs font-bold">Kira the Koi • LVL 5</Text>
           </View>
+        </TouchableOpacity>
+
+        <View className="px-4">
+          {activeLayout.map(widgetName => widgetDictionary[widgetName])}
         </View>
 
-        {/* 动态渲染组件 */}
-        {activeLayout.map(widgetName => widgetDictionary[widgetName])}
-
-        {/* 如果没选满4个，底部给个提示引导 */}
         {activeLayout.length < 4 && (
           <TouchableOpacity onPress={() => setIsEditing(true)} className="mx-4 mt-2 mb-4 p-5 border border-dashed border-accent/40 rounded-2xl items-center bg-accent/5">
             <Text className="text-accent font-bold">+ Add widget ({activeLayout.length}/4)</Text>
           </TouchableOpacity>
         )}
 
-        <View className="mt-2 mb-4">
+        <View className="mx-4 mt-2 mb-4">
           <NudgeBanner onPress={() => router.push("/saving-plan")} />
         </View>
       </ScrollView>

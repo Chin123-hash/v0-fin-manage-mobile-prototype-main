@@ -9,7 +9,7 @@ import Animated, {
   useSharedValue, 
   useAnimatedStyle, 
   withTiming, 
-  easing, 
+  Easing, 
   runOnJS 
 } from "react-native-reanimated";
 
@@ -63,7 +63,7 @@ export default function RewardsScreen() {
     
     rotation.value = withTiming(newRotation, {
       duration: 3000,
-      easing: easing.out(easing.quad),
+      easing: Easing.out(Easing.quad),
     }, (finished) => {
       if (finished) {
         runOnJS(setIsSpinning)(false);

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Wallet, Plane, ShoppingBag, Shield, X, Plus, Utensils } from "lucide-react-native";
+// Fixed: Added PlusCircle to the main import block
+import { Wallet, Plane, ShoppingBag, Shield, X, Plus, Utensils, PlusCircle } from "lucide-react-native";
 import { formatRM, calculateProgress, type MentalAccount } from "@/lib/mock-data";
 import { colors } from "@/lib/constants";
 
-// 图标映射
+// Icon mapping
 const iconMap: Record<string, React.ElementType> = {
   wallet: Wallet,
   plane: Plane,
@@ -14,7 +15,7 @@ const iconMap: Record<string, React.ElementType> = {
   utensils: Utensils,
 };
 
-// 渐变色主题定义
+// Theme gradients
 const themeGradients: Record<string, [string, string]> = {
   neutral: [colors.background.card, colors.background.cardLight],
   travel: ["#1a3a5c", "#2d5a8a"],
@@ -51,7 +52,7 @@ function MentalAccountCard({ account, onDelete }: MentalAccountCardProps) {
             <Icon size={20} color={account.theme === "neutral" ? colors.accent.teal : "white"} />
           </View>
           
-          {/* Daily Account 不能删除 */}
+          {/* Locked accounts that cannot be deleted */}
           {account.id !== "daily" && account.id !== "1" && (
             <TouchableOpacity 
               onPress={() => onDelete?.(account.id)}
@@ -153,10 +154,11 @@ export function MentalAccounts({ accounts, onAddAccount, onDeleteAccount }: Ment
           <MentalAccountCard key={account.id} account={account} onDelete={onDeleteAccount} />
         ))}
         
-        {/* Add New Account Button - Encouraging user action */}
+        {/* Fixed: PlusCircle is now correctly imported and scoped here */}
         <TouchableOpacity 
           className="w-40 bg-background-card rounded-[24px] p-4 items-center justify-center border border-dashed border-accent/30"
           activeOpacity={0.7}
+          onPress={() => setIsAdding(true)}
         >
           <View className="w-10 h-10 rounded-full bg-accent/10 items-center justify-center mb-2">
             <PlusCircle size={24} color={colors.accent.teal} />

@@ -9,6 +9,9 @@ interface BubbleProps {
   size: number;
 }
 
+/**
+ * Animated Bubble component for the aquarium background
+ */
 function Bubble({ delay, left, size }: BubbleProps) {
   const translateY = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(0)).current;
@@ -71,13 +74,15 @@ function Bubble({ delay, left, size }: BubbleProps) {
 interface DigitalTankProps {
   height?: number;
   showFullTank?: boolean;
-  // 1. 增加 koiColor 属性
+  // 1. Added koiColor property to synchronize with persona quiz results
   koiColor?: string;
 }
 
-// 2. 接收 koiColor 参数，设置默认值为 "gold"
+/**
+ * The Digital Sanctuary Tank component
+ */
 export function DigitalTank({ height = 200, showFullTank = false, koiColor = "gold" }: DigitalTankProps) {
-  // Generate random bubbles
+  // Configurable bubble positions and delays
   const bubbles = [
     { delay: 0, left: 15, size: 6 },
     { delay: 800, left: 30, size: 8 },
@@ -91,7 +96,7 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
 
   return (
     <View
-      className="w-full overflow-hidden rounded-2xl"
+      className="w-full overflow-hidden rounded-3xl"
       style={{ height: showFullTank ? height * 2 : height }}
     >
       {/* Water gradient background */}
@@ -102,7 +107,7 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
         end={{ x: 0, y: 1 }}
         style={{ flex: 1, position: "relative" }}
       >
-        {/* Light rays from top */}
+        {/* Light rays from top for atmosphere */}
         <View
           style={{
             position: "absolute",
@@ -142,7 +147,7 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
           <Bubble key={index} {...bubble} />
         ))}
 
-        {/* Koi Fish - centered in tank */}
+        {/* Primary Koi Fish (Kira) - positioned in tank */}
         <View
           style={{
             position: "absolute",
@@ -151,11 +156,11 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
             transform: [{ translateX: -40 }],
           }}
         >
-          {/* 3. 将 koiColor 传给主角 Kira */}
+          {/* 3. Passing the dynamic koiColor to the fish component */}
           <KoiFish size={80} color={koiColor as any} />
         </View>
 
-        {/* Second Koi for full tank view */}
+        {/* Second Koi for full tank (Social view) */}
         {showFullTank && (
           <View
             style={{
@@ -183,62 +188,11 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
             paddingHorizontal: 16,
           }}
         >
-          {/* Seaweed elements */}
-          <View
-            style={{
-              width: 8,
-              height: 35,
-              backgroundColor: "#00f5d4",
-              opacity: 0.3,
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-              transform: [{ rotate: "-5deg" }],
-            }}
-          />
-          <View
-            style={{
-              width: 6,
-              height: 25,
-              backgroundColor: "#00d4aa",
-              opacity: 0.25,
-              borderTopLeftRadius: 15,
-              borderTopRightRadius: 15,
-              transform: [{ rotate: "8deg" }],
-            }}
-          />
-          <View
-            style={{
-              width: 10,
-              height: 40,
-              backgroundColor: "#00f5d4",
-              opacity: 0.35,
-              borderTopLeftRadius: 25,
-              borderTopRightRadius: 25,
-              transform: [{ rotate: "-3deg" }],
-            }}
-          />
-          <View
-            style={{
-              width: 7,
-              height: 30,
-              backgroundColor: "#00d4aa",
-              opacity: 0.28,
-              borderTopLeftRadius: 18,
-              borderTopRightRadius: 18,
-              transform: [{ rotate: "6deg" }],
-            }}
-          />
-          <View
-            style={{
-              width: 9,
-              height: 38,
-              backgroundColor: "#00f5d4",
-              opacity: 0.32,
-              borderTopLeftRadius: 22,
-              borderTopRightRadius: 22,
-              transform: [{ rotate: "-7deg" }],
-            }}
-          />
+          <View style={[styles.seaweed, { height: 35, transform: [{ rotate: "-5deg" }] }]} />
+          <View style={[styles.seaweed, { height: 25, backgroundColor: "#00d4aa", opacity: 0.25, transform: [{ rotate: "8deg" }] }]} />
+          <View style={[styles.seaweed, { height: 40, transform: [{ rotate: "-3deg" }] }]} />
+          <View style={[styles.seaweed, { height: 30, backgroundColor: "#00d4aa", opacity: 0.28, transform: [{ rotate: "6deg" }] }]} />
+          <View style={[styles.seaweed, { height: 38, transform: [{ rotate: "-7deg" }] }]} />
         </View>
 
         {/* Sandy bottom gradient */}
@@ -258,3 +212,13 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
     </View>
   );
 }
+
+const styles = {
+  seaweed: {
+    width: 8,
+    backgroundColor: "#00f5d4",
+    opacity: 0.3,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  }
+};

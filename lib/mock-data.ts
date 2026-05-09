@@ -381,3 +381,8 @@ export const quizQuestions = [
     ]
   }
 ];
+
+export const appState = {
+  userPersona: null as PersonaType | null,
+  hasFinishedQuiz: false,
+};
