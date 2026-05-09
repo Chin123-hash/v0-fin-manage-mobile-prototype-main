@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { DigitalTank } from "@/components/fin-manage/DigitalTank";
 import { 
   userProfile, 
@@ -9,7 +9,8 @@ import {
   rewards, 
   formatRM, 
   personaConfigs, 
-  appState // 🔥 Import global state for synchronization
+  appState, 
+  type PersonaType 
 } from "@/lib/mock-data";
 import { 
   Settings, 
@@ -28,9 +29,19 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [showGroupTank, setShowGroupTank] = useState(false);
 
-  // 🔥 Read current state from the global source of truth
-  const hasPersona = appState.hasFinishedQuiz; 
-  const userPersona = appState.userPersona || "balancer"; 
+  // 🔥 State for synchronization with global appState
+  const [hasPersona, setHasPersona] = useState(appState.hasFinishedQuiz);
+  const [userPersona, setUserPersona] = useState<PersonaType>(appState.userPersona || "balancer");
+
+  // 🔥 Ensures the profile tab refreshes and unlocks the fish immediately after the quiz
+  useFocusEffect(
+    useCallback(() => {
+      setHasPersona(appState.hasFinishedQuiz);
+      if (appState.userPersona) {
+        setUserPersona(appState.userPersona);
+      }
+    }, [])
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
@@ -82,7 +93,7 @@ export default function ProfileScreen() {
           </View>
 
           {!hasPersona ? (
-            /* Locked State: Encourages user to take the Persona Quiz */
+            /* Locked State */
             <TouchableOpacity 
               onPress={() => router.push('/fin-manage')}
               className="bg-background-card h-40 rounded-3xl items-center justify-center border border-dashed border-accent/30 shadow-sm"
@@ -92,7 +103,7 @@ export default function ProfileScreen() {
               <Text className="text-foreground-muted text-xs">Complete the quiz in Fin Manage to unlock</Text>
             </TouchableOpacity>
           ) : (
-            /* Unlocked State: Interactive Tank Navigation with Respective Color */
+            /* Unlocked State: Reflects respective persona color */
             <TouchableOpacity 
               onPress={() => router.push('/pet-hub')}
               activeOpacity={0.9}
