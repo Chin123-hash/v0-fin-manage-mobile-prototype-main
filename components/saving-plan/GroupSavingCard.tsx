@@ -14,7 +14,7 @@ export function GroupSavingCard() {
 
   const handleGroupPress = (id: string, name: string) => {
     router.push({
-      pathname: "/group-chat/[id]",
+      pathname: "/group-chat/[id]", 
       params: { id, name }
     });
   };
