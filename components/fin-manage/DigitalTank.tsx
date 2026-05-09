@@ -71,9 +71,12 @@ function Bubble({ delay, left, size }: BubbleProps) {
 interface DigitalTankProps {
   height?: number;
   showFullTank?: boolean;
+  // 1. 增加 koiColor 属性
+  koiColor?: string;
 }
 
-export function DigitalTank({ height = 200, showFullTank = false }: DigitalTankProps) {
+// 2. 接收 koiColor 参数，设置默认值为 "gold"
+export function DigitalTank({ height = 200, showFullTank = false, koiColor = "gold" }: DigitalTankProps) {
   // Generate random bubbles
   const bubbles = [
     { delay: 0, left: 15, size: 6 },
@@ -148,7 +151,8 @@ export function DigitalTank({ height = 200, showFullTank = false }: DigitalTankP
             transform: [{ translateX: -40 }],
           }}
         >
-          <KoiFish size={80} color="orange" />
+          {/* 3. 将 koiColor 传给主角 Kira */}
+          <KoiFish size={80} color={koiColor as any} />
         </View>
 
         {/* Second Koi for full tank view */}
