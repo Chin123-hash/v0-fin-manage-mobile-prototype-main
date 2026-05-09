@@ -1,9 +1,8 @@
-// app/group-tank/[id].tsx
 import React from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, Target, Info } from "lucide-react-native";
+import { ChevronLeft, Target, Gift } from "lucide-react-native"; // Import Gift for rewards
 import { DigitalTank } from "@/components/fin-manage/DigitalTank";
 import { colors } from "@/lib/constants";
 import { appState } from "@/lib/mock-data";
@@ -43,8 +42,12 @@ export default function GroupTankScreen() {
                             <Text className="text-white/60 text-[10px] uppercase tracking-widest">Shared Save Pocket</Text>
                         </View>
 
-                        <TouchableOpacity className="w-10 h-10 rounded-full bg-black/20 items-center justify-center">
-                            <Info size={20} color="#ffffff" />
+                        {/* NEW: Rewards Button moved to top right */}
+                        <TouchableOpacity
+                            onPress={() => router.push("/(tabs)/rewards")} // Navigates to reward page
+                            className="w-10 h-10 rounded-full bg-accent-pink/80 items-center justify-center border border-white/20"
+                        >
+                            <Gift size={20} color="#ffffff" />
                         </TouchableOpacity>
                     </View>
 
@@ -56,18 +59,6 @@ export default function GroupTankScreen() {
                                 This is where your squad's rewards will appear. Start saving together to unlock rare pets and decorations!
                             </Text>
                         </View>
-                    </View>
-
-                    {/* Bottom Action Area */}
-                    <View className="p-6 mb-4">
-                        <TouchableOpacity
-                            onPress={showMissions}
-                            activeOpacity={0.8}
-                            className="bg-accent-teal rounded-2xl p-5 flex-row items-center justify-center shadow-lg"
-                        >
-                            <Target size={24} color="#1a0a2e" strokeWidth={2.5} />
-                            <Text className="text-[#1a0a2e] font-bold text-lg ml-3">View Rewards Mission</Text>
-                        </TouchableOpacity>
                     </View>
 
                 </SafeAreaView>
