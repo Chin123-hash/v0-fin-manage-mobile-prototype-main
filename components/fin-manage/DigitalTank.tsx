@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Animated, Easing } from "react-native";
+import { View, Animated, Easing, ViewStyle } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { KoiFish } from "./KoiFish";
 
@@ -22,8 +22,8 @@ function Bubble({ delay, left, size }: BubbleProps) {
         Animated.delay(delay),
         Animated.parallel([
           Animated.timing(translateY, {
-            toValue: -150,
-            duration: 3000,
+            toValue: -300, // Increased for full screen
+            duration: 4000,
             easing: Easing.out(Easing.ease),
             useNativeDriver: true,
           }),
@@ -35,7 +35,7 @@ function Bubble({ delay, left, size }: BubbleProps) {
             }),
             Animated.timing(opacity, {
               toValue: 0,
-              duration: 2500,
+              duration: 3500,
               useNativeDriver: true,
             }),
           ]),
@@ -56,7 +56,7 @@ function Bubble({ delay, left, size }: BubbleProps) {
     <Animated.View
       style={{
         position: "absolute",
-        bottom: 20,
+        bottom: -20,
         left: `${left}%`,
         width: size,
         height: size,
@@ -74,6 +74,18 @@ function Bubble({ delay, left, size }: BubbleProps) {
 interface DigitalTankProps {
   height?: number;
   showFullTank?: boolean;
+  isFullScreen?: boolean; // New prop for full screen
+  hideFish?: boolean;     // New prop to make it empty
+  children?: React.ReactNode; // Allow overlays
+}
+
+export function DigitalTank({
+  height = 200,
+  showFullTank = false,
+  isFullScreen = false,
+  hideFish = false,
+  children
+}: DigitalTankProps) {
   // 1. Added koiColor property to synchronize with persona quiz results
   koiColor?: string;
 }
@@ -94,19 +106,23 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
     { delay: 2000, left: 40, size: 6 },
   ];
 
+  const containerStyle: ViewStyle = isFullScreen
+    ? { flex: 1 }
+    : { height: showFullTank ? height * 2 : height };
+
   return (
     <View
-      className="w-full overflow-hidden rounded-3xl"
-      style={{ height: showFullTank ? height * 2 : height }}
+      className={`w-full overflow-hidden ${isFullScreen ? "" : "rounded-2xl"}`}
+      style={containerStyle}
     >
-      {/* Water gradient background */}
       <LinearGradient
         colors={["#0a2a3a", "#0d3347", "#1a4a5a", "#0d3347"]}
         locations={[0, 0.3, 0.7, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
         style={{ flex: 1, position: "relative" }}
       >
+        {/* Light rays */}
+        <View style={{ position: "absolute", top: 0, left: "20%", width: "15%", height: "100%", backgroundColor: "rgba(0, 245, 212, 0.05)", transform: [{ skewX: "-15deg" }] }} />
+        <View style={{ position: "absolute", top: 0, left: "50%", width: "10%", height: "100%", backgroundColor: "rgba(0, 245, 212, 0.03)", transform: [{ skewX: "10deg" }] }} />
         {/* Light rays from top for atmosphere */}
         <View
           style={{
@@ -147,6 +163,22 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
           <Bubble key={index} {...bubble} />
         ))}
 
+        {/* Conditional rendering of fish */}
+        {!hideFish && (
+          <>
+            <View style={{ position: "absolute", top: "30%", left: "50%", transform: [{ translateX: -40 }] }}>
+              <KoiFish size={80} color="orange" />
+            </View>
+            {showFullTank && (
+              <View style={{ position: "absolute", top: "55%", left: "25%", transform: [{ translateX: -30 }, { scaleX: -1 }] }}>
+                <KoiFish size={60} color="gold" />
+              </View>
+            )}
+          </>
+        )}
+
+        {/* Children for UI overlays */}
+        {children}
         {/* Primary Koi Fish (Kira) - positioned in tank */}
         <View
           style={{
@@ -195,19 +227,13 @@ export function DigitalTank({ height = 200, showFullTank = false, koiColor = "go
           <View style={[styles.seaweed, { height: 38, transform: [{ rotate: "-7deg" }] }]} />
         </View>
 
-        {/* Sandy bottom gradient */}
-        <LinearGradient
-          colors={["transparent", "rgba(45, 27, 78, 0.5)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 20,
-          }}
-        />
+        {/* Plants and Sandy Bottom */}
+        <View style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, flexDirection: "row", justifyContent: "space-around", alignItems: "flex-end", paddingHorizontal: 16 }}>
+          {[35, 25, 40, 30, 38].map((h, i) => (
+            <View key={i} style={{ width: 8, height: h, backgroundColor: "#00f5d4", opacity: 0.3, borderTopLeftRadius: 20, borderTopRightRadius: 20 }} />
+          ))}
+        </View>
+        <LinearGradient colors={["transparent", "rgba(45, 27, 78, 0.5)"]} style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 20 }} />
       </LinearGradient>
     </View>
   );
