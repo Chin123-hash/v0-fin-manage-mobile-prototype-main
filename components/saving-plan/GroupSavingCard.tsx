@@ -12,6 +12,13 @@ export function GroupSavingCard() {
   const groups = appState.groups;
   const isJoined = groups.length > 0;
 
+  const handleGroupPress = (id: string, name: string) => {
+    router.push({
+      pathname: "/group-chat/[id]",
+      params: { id, name }
+    });
+  };
+
   const handleJoinAction = () => {
     router.push("/group-saving-onboarding");
   };
@@ -65,7 +72,12 @@ export function GroupSavingCard() {
         ) : (
           <View className="gap-4">
             {groups.map((group, index) => (
-              <View key={group.id} className={index > 0 ? "pt-4 border-t border-white/5" : ""}>
+              <TouchableOpacity
+                key={group.id}
+                onPress={() => handleGroupPress(group.id, group.name)} // Added navigation
+                activeOpacity={0.7}
+                className={index > 0 ? "pt-4 border-t border-white/5" : ""}
+              >
                 <View className="flex-row justify-between mb-2">
                   <View>
                     <Text className="text-foreground-secondary text-[10px] uppercase font-bold tracking-widest">{group.name}</Text>
@@ -76,7 +88,7 @@ export function GroupSavingCard() {
                     <Text className="text-accent font-bold text-xs ml-1">+0.5% p.a.</Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
