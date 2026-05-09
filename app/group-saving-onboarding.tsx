@@ -31,13 +31,29 @@ export default function GroupSavingOnboardingScreen() {
     };
 
     const handleComplete = () => {
-        // Use the custom name or a default based on group count
         const finalName = groupName.trim() || (appState.groups.length === 0 ? "Japan Trip Squad" : "Gaming Fund");
+
+        // Map selected IDs back to full contact objects
+        const invitedMembers = fakeContacts.filter(c => selectedContacts.includes(c.id));
 
         const newGroup: GroupInstance = {
             id: `group-${appState.groups.length + 1}`,
             name: finalName,
             balance: 0,
+            members: invitedMembers.map(c => ({
+                id: c.id,
+                name: c.name,
+                initials: c.name[0],
+                color: colors.accent.pink
+            })),
+            messages: [],
+            rewards: [],
+            missions: [],
+            achievements: [],
+            leaderboard: [],
+            notifications: [],
+            settings: [],
+            pocketBalance: 0,
         };
 
         appState.groups.push(newGroup);

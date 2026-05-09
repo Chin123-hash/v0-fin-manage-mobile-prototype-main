@@ -259,6 +259,14 @@ export interface GroupInstance {
   id: string;
   name: string;
   balance: number;
+  members: GroupMember[];
+  messages: Message[];
+  rewards: Reward[];
+  missions: Mission[];
+  achievements: Achievement[];
+  leaderboard: Leaderboard[];
+  notifications: Notification[];
+  settings: Settings[];
 }
 
 // Add a global-ish state for the prototype
