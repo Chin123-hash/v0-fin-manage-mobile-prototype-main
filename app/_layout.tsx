@@ -2,11 +2,17 @@ import "../global.css";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { DraggablePet } from "../components/fin-manage/DraggablePet"; // Ensure you have created this file
 
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="light" />
+      
+      {/* The Stack manages your app navigation. 
+          The DraggablePet is placed outside of it so it stays 
+          on top of all screens and doesn't reset when you navigate.
+      */}
       <Stack
         screenOptions={{
           headerShown: false,
@@ -23,6 +29,10 @@ export default function RootLayout() {
           }}
         />
       </Stack>
+
+      {/* Persistent interactive companion */}
+      <DraggablePet />
+      
     </GestureHandlerRootView>
   );
 }
