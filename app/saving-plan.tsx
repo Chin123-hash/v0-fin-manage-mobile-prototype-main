@@ -84,7 +84,7 @@ export default function SavingPlanScreen() {
           <View className="flex-1">
             <Text className="text-purple-400 font-bold text-sm">Powered by GXBank</Text>
             <Text className="text-foreground-muted text-xs mt-1 leading-4">
-              Your automated savings go to a secure Save Pocket earning <Text className="text-foreground font-semibold">3.00% p.a. daily interest</Text>.
+              Your automated savings go to a secure Save Pocket earning <Text className="text-foreground font-semibold">2.00% p.a. daily interest</Text>.
             </Text>
           </View>
         </View>

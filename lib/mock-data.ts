@@ -193,11 +193,11 @@ export const microSavingOptions: MicroSavingOption[] = [
 
 // Yield Maximizer Milestones
 export const yieldMilestones = [
-  { amount: 0, rate: 3.0, label: "Start" },
-  { amount: 1000, rate: 3.0, label: "RM1K" },
-  { amount: 2500, rate: 3.5, label: "RM2.5K" },
-  { amount: 5000, rate: 4.0, label: "RM5K" },
-  { amount: 10000, rate: 4.5, label: "RM10K" },
+  { amount: 0, rate: 2.0, label: "Start" },
+  { amount: 1000, rate: 2.4, label: "RM1K" },
+  { amount: 2500, rate: 2.8, label: "RM2.5K" },
+  { amount: 5000, rate: 3.2, label: "RM5K" },
+  { amount: 10000, rate: 3.55, label: "RM10K" },
 ];
 
 // Pet (Koi) Stats

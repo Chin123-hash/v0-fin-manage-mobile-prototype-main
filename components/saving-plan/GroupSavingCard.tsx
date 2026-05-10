@@ -154,7 +154,7 @@ export function GroupSavingCard() {
               <View className="flex-1">
                 <Text className="text-purple-400 font-bold text-sm">GXBank Savings Pocket</Text>
                 <Text className="text-foreground-muted text-xs mt-1 leading-4">
-                  Your funds are secure and actively earning <Text className="text-foreground font-semibold">3.00% p.a. daily interest</Text>.
+                  Your funds are secure and actively earning <Text className="text-foreground font-semibold">2.00% + 0.50% (Group Rewards) p.a. daily interest</Text>.
                 </Text>
               </View>
             </View>

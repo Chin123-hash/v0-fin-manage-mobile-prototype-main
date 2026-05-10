@@ -339,7 +339,7 @@ export default function FinManageScreen() {
 
   const widgetDictionary: Record<string, React.ReactNode> = {
     SavingStreak: <View className="mb-6 -mx-4" key="streak"><SavingStreak streak={currentStreak} /></View>,
-    YieldMaximizer: <View className="mb-6 -mx-4" key="yield"><YieldMaximizer currentSavings={savingStats.currentSavings} currentRate={isPlanActive ? 4.0 : 3.5} /></View>,
+    YieldMaximizer: <View className="mb-6 -mx-4" key="yield"><YieldMaximizer currentSavings={savingStats.currentSavings} currentRate={isPlanActive ? 4.0 : 2.4} /></View>,
     AIInsights: <View className="mb-6 -mx-4" key="ai"><AIInsights /></View>,
     
     // 🔥 Restored to standard view without the negative margins or forced heights!

@@ -74,7 +74,7 @@ export default function GroupSavingOnboardingScreen() {
                             <View className="flex-1">
                                 <Text className="text-purple-400 font-bold text-base mb-1">GXBank Savings Pocket</Text>
                                 <Text className="text-foreground-muted text-xs leading-4">
-                                    Your squad's funds are secured and actively earning <Text className="text-foreground font-semibold">3.00% p.a. daily interest</Text>.
+                                    Your squad's funds are secured and actively earning <Text className="text-foreground font-semibold">2.00% + 0.50% (Group Rewards) p.a. daily interest</Text>.
                                 </Text>
                             </View>
                         </View>
@@ -89,7 +89,7 @@ export default function GroupSavingOnboardingScreen() {
                                 <TrendingUp size={24} color={colors.accent.teal} />
                                 <Text className="text-accent font-bold text-lg ml-3">+0.5% p.a. Bonus</Text>
                             </View>
-                            <Text className="text-foreground-muted text-sm">Boost your group's collective interest rate on top of the base 3.00% p.a. from GXBank!</Text>
+                            <Text className="text-foreground-muted text-sm">Boost your group's collective interest rate on top of the base 2.00% p.a. from GXBank!</Text>
                         </View>
                         <View className="bg-background-card p-5 rounded-2xl border border-accent-pink/20">
                             <View className="flex-row items-center mb-2">
