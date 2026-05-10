@@ -4,7 +4,7 @@ import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { X, Check, Sparkles } from "lucide-react-native";
+import { X, Check, Sparkles, ShieldCheck } from "lucide-react-native";
 import { MicroSavingChips } from "@/components/saving-plan/MicroSavingChips";
 import { FutureSavingLogic } from "@/components/saving-plan/FutureSavingLogic";
 // Removed GroupSavingCard import
@@ -69,11 +69,24 @@ export default function SavingPlanScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
       >
-        <View className="mb-6">
+        <View className="mb-4">
           <Text className="text-foreground-muted text-center">
             Create smart saving habits with automated rules. Every small step
             counts towards your goals!
           </Text>
+        </View>
+
+        {/* 🔥 GXBank Promo Banner */}
+        <View className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-4 mb-6 flex-row items-center">
+          <View className="w-10 h-10 bg-purple-500/20 rounded-full items-center justify-center mr-3">
+            <ShieldCheck size={20} color="#a855f7" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-purple-400 font-bold text-sm">Powered by GXBank</Text>
+            <Text className="text-foreground-muted text-xs mt-1 leading-4">
+              Your automated savings go to a secure Save Pocket earning <Text className="text-foreground font-semibold">3.00% p.a. daily interest</Text>.
+            </Text>
+          </View>
         </View>
 
         <MicroSavingChips
@@ -87,8 +100,6 @@ export default function SavingPlanScreen() {
           onSaveAmountChange={setSaveAmount}
           onTriggerAmountChange={setTriggerAmount}
         />
-
-        {/* Removed GroupSavingCard from here */}
 
         {/* Summary */}
         <View className="bg-background-card rounded-xl p-4 mb-4">

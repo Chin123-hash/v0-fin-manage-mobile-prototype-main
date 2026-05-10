@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, FlatList, TextInput, KeyboardAvoidingView
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { X, ChevronRight, Users, Sparkles, TrendingUp, Check, Edit3 } from "lucide-react-native";
+import { X, ChevronRight, Users, Sparkles, TrendingUp, Check, Edit3, ShieldCheck } from "lucide-react-native";
 import { colors } from "@/lib/constants";
 import { fakeContacts, appState, GroupInstance } from "@/lib/mock-data";
 
@@ -63,8 +63,21 @@ export default function GroupSavingOnboardingScreen() {
                         </View>
                         <Text className="text-foreground text-2xl font-bold text-center mb-4">Save Faster, Together</Text>
                         <Text className="text-foreground-muted text-center text-base leading-6">
-                            Group Saving Challenge lets you and your friends pool money into a shared GXBank Save Pocket.
+                            Pool money with your friends effortlessly while securing your funds in a shared digital vault.
                         </Text>
+
+                        {/* 🔥 GXBank Promo Banner */}
+                        <View className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-4 mt-8 w-full flex-row items-center">
+                            <View className="w-12 h-12 bg-purple-500/20 rounded-full items-center justify-center mr-4">
+                                <ShieldCheck size={24} color="#a855f7" />
+                            </View>
+                            <View className="flex-1">
+                                <Text className="text-purple-400 font-bold text-base mb-1">GXBank Savings Pocket</Text>
+                                <Text className="text-foreground-muted text-xs leading-4">
+                                    Your squad's funds are secured and actively earning <Text className="text-foreground font-semibold">3.00% p.a. daily interest</Text>.
+                                </Text>
+                            </View>
+                        </View>
                     </View>
                 );
             case 1:
@@ -76,14 +89,14 @@ export default function GroupSavingOnboardingScreen() {
                                 <TrendingUp size={24} color={colors.accent.teal} />
                                 <Text className="text-accent font-bold text-lg ml-3">+0.5% p.a. Bonus</Text>
                             </View>
-                            <Text className="text-foreground-muted text-sm">Boost your group's collective interest rate.</Text>
+                            <Text className="text-foreground-muted text-sm">Boost your group's collective interest rate on top of the base 3.00% p.a. from GXBank!</Text>
                         </View>
                         <View className="bg-background-card p-5 rounded-2xl border border-accent-pink/20">
                             <View className="flex-row items-center mb-2">
                                 <Sparkles size={24} color={colors.accent.pink} />
                                 <Text className="text-accent-pink font-bold text-lg ml-3">Gold Fin Decoration</Text>
                             </View>
-                            <Text className="text-foreground-muted text-sm">Unlock the legendary Neon Gold Fin for Kira.</Text>
+                            <Text className="text-foreground-muted text-sm">Unlock the legendary Neon Gold Fin for your pet Koi.</Text>
                         </View>
                     </View>
                 );
