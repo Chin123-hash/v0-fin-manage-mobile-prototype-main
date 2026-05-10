@@ -44,7 +44,9 @@ export function DraggablePet() {
   }));
 
   // 🔥 HIDE ON SPECIFIC SCREENS OR IF QUIZ NOT FINISHED
-  const isHidden = pathname === '/fin-manage' || pathname === '/pet-hub' || pathname === '/me' || !hasFinishedQuiz;
+  // Added pathname.startsWith('/group-tank') to hide it in the group tank as well!
+  const isHidden = pathname === '/fin-manage' || pathname === '/pet-hub' || pathname === '/me' || pathname.startsWith('/group-tank') || !hasFinishedQuiz;
+  
   if (isHidden) return null;
 
   return (

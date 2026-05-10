@@ -109,7 +109,21 @@ export function GroupSavingCard() {
                   </View>
                 </View>
 
-                {/* 🔥 The New Action Buttons */}
+                {/* 🔥 New Task 3: Group Streak Progress Bar */}
+                <View className="mb-4 bg-background p-3 rounded-2xl border border-border/50">
+                  <View className="flex-row justify-between items-center mb-2">
+                    <Text className="text-foreground font-semibold text-sm">Squad Streak: 1 Day</Text>
+                    <Text className="text-accent font-bold text-xs">9/10 to Reward</Text>
+                  </View>
+                  <View className="h-2 w-full bg-background-cardLight rounded-full overflow-hidden mb-2">
+                    <View className="h-full bg-accent rounded-full" style={{ width: '10%' }} />
+                  </View>
+                  <Text className="text-foreground-muted text-[10px] leading-3 italic">
+                    Keep on working up on personal saving to continue the group streak!
+                  </Text>
+                </View>
+
+                {/* 🔥 The Action Buttons */}
                 <View className="flex-row gap-3">
                   <TouchableOpacity
                     onPress={() => handleGroupPress(group.id, group.name)}

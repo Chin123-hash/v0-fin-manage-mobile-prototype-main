@@ -58,7 +58,9 @@ export default function GroupTankScreen() {
                                 zIndex: 10
                             }}
                         >
-                            <KoiFish size={pos.size} color={color as any} />
+                            {/* 🔥 Explicitly set teammates to Level 5 so they don't get the crown */}
+                            <KoiFish size={pos.size} color={color as any} level={5} />
+                            
                             {/* Teammate Name Tag */}
                             <View 
                                 className="bg-black/50 px-2 py-1 rounded-full mt-2" 

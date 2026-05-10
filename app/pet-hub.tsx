@@ -1,36 +1,68 @@
-import React from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import React, { useState, useCallback } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
 import { KoiFish } from "@/components/fin-manage/KoiFish";
 import { 
   savingStats, 
-  petStats, 
   personaConfigs, 
-  appState // 🔥 Import global state for persona synchronization
+  appState 
 } from "@/lib/mock-data";
 import { colors } from "@/lib/constants";
 
 interface MissionCardProps {
+  id: string;
   title: string;
   description: string;
   reward: string;
   progress: number;
   total: number;
+  onClaim: (id: string) => void;
+  isClaimed: boolean;
 }
 
 export default function PetHubScreen() {
   const router = useRouter();
+  const [xp, setXp] = useState(appState.petStats.xp);
+  const [level, setLevel] = useState(appState.petStats.level);
+  const [claimedMissions, setClaimedMissions] = useState<string[]>([]);
 
-  // 🔥 Dynamically retrieve the persona from the global state
-  // Default to 'balancer' if the quiz hasn't been completed yet
   const userPersona = appState.userPersona || "balancer"; 
   const config = personaConfigs[userPersona];
 
+  const handleClaim = (missionId: string) => {
+    if (claimedMissions.includes(missionId)) return;
+
+    setClaimedMissions([...claimedMissions, missionId]);
+    
+    // Logic for XP gain
+    let xpGain = 25;
+    let nextXp = xp + xpGain;
+    let nextLevel = level;
+
+    if (nextXp >= 100) {
+      nextLevel += 1;
+      nextXp = nextXp - 100;
+      Alert.alert("Level Up! 🎉", `${appState.petStats.name} is now Level ${nextLevel}! You've unlocked a new decoration.`);
+      
+      // Unlock the next decoration
+      const lockedDecor = appState.rewards.find(r => !r.isUnlocked && r.type === "decoration");
+      if (lockedDecor) {
+        lockedDecor.isUnlocked = true;
+      }
+    }
+
+    setXp(nextXp);
+    setLevel(nextLevel);
+    
+    // Sync to global state
+    appState.petStats.xp = nextXp;
+    appState.petStats.level = nextLevel;
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
-      {/* Header with Navigation */}
       <View className="flex-row items-center px-4 py-4">
         <TouchableOpacity 
           onPress={() => router.back()}
@@ -39,7 +71,7 @@ export default function PetHubScreen() {
           <ChevronLeft size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <View>
-          <Text className="text-foreground font-bold text-2xl">{petStats.name}'s Sanctuary</Text>
+          <Text className="text-foreground font-bold text-2xl">{appState.petStats.name}'s Sanctuary</Text>
           <Text className="text-foreground-muted text-sm">
             {config.name} • Level up your resilience
           </Text>
@@ -47,14 +79,12 @@ export default function PetHubScreen() {
       </View>
 
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-        {/* Main Pet Interaction Area */}
         <View className="bg-background-card rounded-[40px] h-80 items-center justify-center mb-6 border border-accent/20 shadow-xl shadow-black/20">
-           {/* 🔥 Dynamically apply Fish Color based on the Unlocked Persona */}
            <KoiFish size={200} color={config.fishColor as any} />
            
            <View className="absolute bottom-8 flex-row space-x-4">
              <TouchableOpacity className="bg-accent/20 px-8 py-3.5 rounded-full border border-accent/30 shadow-sm">
-                <Text className="text-accent font-bold">🍎 Feed</Text>
+                <Text className="text-accent font-bold">🍕 Feed</Text>
              </TouchableOpacity>
              <TouchableOpacity className="bg-accent/20 px-8 py-3.5 rounded-full border border-accent/30 shadow-sm">
                 <Text className="text-accent font-bold">🧼 Clean</Text>
@@ -62,60 +92,67 @@ export default function PetHubScreen() {
            </View>
         </View>
 
-        {/* Level & Progression Status */}
         <View className="bg-background-secondary p-6 rounded-3xl mb-8 border border-background-cardLight">
           <View className="flex-row justify-between items-center mb-4">
             <View>
-              <Text className="text-foreground font-bold text-xl">Level {petStats.level}</Text>
+              <Text className="text-foreground font-bold text-xl">Level {level}</Text>
               <Text className="text-accent text-xs font-bold uppercase tracking-widest">
                 Saving Sage
               </Text>
             </View>
             <View className="items-end">
-              <Text className="text-accent font-extrabold text-lg">80/100</Text>
+              <Text className="text-accent font-extrabold text-lg">{xp}/100</Text>
               <Text className="text-foreground-muted text-[10px] font-bold">XP TO NEXT LEVEL</Text>
             </View>
           </View>
           
           <View className="h-3 bg-background-card rounded-full overflow-hidden">
-            <View className="h-full bg-accent" style={{ width: '80%' }} />
+            <View className="h-full bg-accent" style={{ width: `${xp}%` }} />
           </View>
 
           <View className="mt-4 flex-row items-center bg-background-card/50 p-3 rounded-xl border border-accent/10">
             <View className="bg-pink/20 px-2 py-1 rounded-md">
-                <Text className="text-pink text-[9px] font-bold">UNLOCKS AT LVL 6</Text>
+                <Text className="text-pink text-[9px] font-bold">UNLOCKS AT LVL {level + 1}</Text>
             </View>
             <Text className="text-foreground-muted text-xs ml-3 flex-1">
-              Next level unlocks the "Premium Gold" tank theme!
+              Next level unlocks more decorations for your tank!
             </Text>
           </View>
         </View>
 
-        {/* Behavioral Habit-Building Missions */}
         <Text className="text-foreground font-bold text-lg mb-4 px-1">Habit-Building Missions</Text>
         
         <MissionCard 
+          id="m1"
           title="Micro-Saver" 
           description="Save RM5 into your Goal today" 
-          reward="10 XP + 1 Fish Food"
+          reward="25 XP + 1 Fish Food"
           progress={1}
           total={1}
+          onClaim={handleClaim}
+          isClaimed={claimedMissions.includes("m1")}
         />
         
         <MissionCard 
+          id="m2"
           title="Streak Protector" 
           description="Maintain your savings streak for 7 days" 
-          reward="50 XP + Rare Coral Decor"
+          reward="25 XP + Rare Coral Decor"
           progress={savingStats.streak}
           total={7}
+          onClaim={handleClaim}
+          isClaimed={claimedMissions.includes("m2")}
         />
 
         <MissionCard 
+          id="m3"
           title="Insight Seeker" 
           description="Review your weekly AI spending analysis" 
-          reward="5 XP"
-          progress={0}
+          reward="25 XP"
+          progress={1}
           total={1}
+          onClaim={handleClaim}
+          isClaimed={claimedMissions.includes("m3")}
         />
         
         <View className="h-10" />
@@ -124,10 +161,7 @@ export default function PetHubScreen() {
   );
 }
 
-/**
- * Shared Mission Card Component
- */
-function MissionCard({ title, description, reward, progress, total }: MissionCardProps) {
+function MissionCard({ id, title, description, reward, progress, total, onClaim, isClaimed }: MissionCardProps) {
   const isCompleted = progress >= total;
   
   return (
@@ -144,11 +178,13 @@ function MissionCard({ title, description, reward, progress, total }: MissionCar
           </View>
         </View>
         <TouchableOpacity 
-          className={`px-5 h-11 justify-center rounded-2xl ${isCompleted ? 'bg-accent' : 'bg-background-secondary'}`}
-          activeOpacity={isCompleted ? 0.7 : 1}
+          className={`px-5 h-11 justify-center rounded-2xl ${isClaimed ? 'bg-background-card border border-border' : isCompleted ? 'bg-accent' : 'bg-background-secondary'}`}
+          activeOpacity={isCompleted && !isClaimed ? 0.7 : 1}
+          onPress={() => isCompleted && !isClaimed && onClaim(id)}
+          disabled={!isCompleted || isClaimed}
         >
-          <Text className={`text-xs font-bold ${isCompleted ? 'text-white' : 'text-foreground-muted'}`}>
-            {isCompleted ? 'Claim' : `${progress}/${total}`}
+          <Text className={`text-xs font-bold ${isClaimed ? 'text-foreground-muted' : isCompleted ? 'text-white' : 'text-foreground-muted'}`}>
+            {isClaimed ? 'Claimed' : isCompleted ? 'Claim' : `${progress}/${total}`}
           </Text>
         </TouchableOpacity>
       </View>

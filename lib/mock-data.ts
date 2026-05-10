@@ -201,15 +201,15 @@ export const yieldMilestones = [
 ];
 
 // Pet (Koi) Stats
-export const petStats = {
-  name: "Kira",
-  type: "Koi Fish",
-  happiness: 85,
-  health: 92,
-  level: 5,
-  feedCount: 3,
-  maxFeedCount: 5,
-};
+// export const petStats = {
+//   name: "Kira",
+//   type: "Koi Fish",
+//   happiness: 85,
+//   health: 92,
+//   level: 5,
+//   feedCount: 3,
+//   maxFeedCount: 5,
+// };
 
 // Quick Actions for Home
 export const quickActions = [
@@ -431,5 +431,24 @@ export const appState = {
     microSavingAmount: 10,
     autoSaveAmount: 10,
     autoSaveTrigger: 100,
-  }
+  },
+  
+  // 🔥 New for Task 1: Leveling & Rewards State
+  petStats: {
+    name: "Kira",
+    type: "Koi Fish",
+    happiness: 85,
+    health: 92,
+    level: 5,
+    xp: 80,
+    feedCount: 3,
+    maxFeedCount: 5,
+  },
+  rewards: [
+    { id: "neon-moss", name: "Neon Moss", description: "Glowing aquatic plant", type: "decoration", isUnlocked: true },
+    { id: "aqua-castle", name: "Aqua Castle", description: "Mini underwater castle", type: "decoration", isUnlocked: true },
+    { id: "bubble-treasure", name: "Bubble Treasure Chest", description: "Mysterious glowing chest", type: "decoration", isUnlocked: false, requiredStreak: 30 },
+    { id: "crystal-coral", name: "Crystal Coral", description: "Shimmering coral formation", type: "decoration", isUnlocked: false, requiredStreak: 20 },
+    { id: "lucky-coin", name: "Lucky Coin Stack", description: "Prosperity decoration", type: "decoration", isUnlocked: true },
+  ] as Reward[]
 };

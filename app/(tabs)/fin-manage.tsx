@@ -132,6 +132,7 @@ export default function FinManageScreen() {
   // V2 State 
   const [isPlanActive, setIsPlanActive] = useState(appState.isPersonalPlanActive);
   const [currentStreak, setCurrentStreak] = useState(savingStats.streak);
+  const [petLevel, setPetLevel] = useState(appState.petStats.level);
 
   useFocusEffect(
     useCallback(() => {
@@ -140,6 +141,7 @@ export default function FinManageScreen() {
 
       setIsPlanActive(currentlyActive);
       setCurrentStreak(currentlyActive ? savingStats.streak : 0);
+      setPetLevel(appState.petStats.level);
 
       if (!previouslyActive && currentlyActive) {
         scrollRef.current?.scrollTo({ y: 0, animated: true });
@@ -401,7 +403,7 @@ export default function FinManageScreen() {
         >
           <DigitalTank height={180} koiColor={config.fishColor} />
           <View className="absolute bottom-2 left-2 bg-background/80 rounded-lg px-3 py-1 border border-accent/10">
-            <Text className="text-accent text-xs font-bold">Kira the Koi • LVL 5</Text>
+            <Text className="text-accent text-xs font-bold">{"Kira the Koi • LVL " + petLevel}</Text>
           </View>
         </TouchableOpacity>
 

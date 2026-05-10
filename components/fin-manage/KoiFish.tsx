@@ -1,3 +1,4 @@
+import { appState } from "@/lib/mock-data";
 import React, { useEffect, useRef } from "react";
 import { Animated, View, Easing } from "react-native";
 import Svg, { Path, Circle, Ellipse, G, Defs, RadialGradient, Stop } from "react-native-svg";
@@ -5,17 +6,18 @@ import Svg, { Path, Circle, Ellipse, G, Defs, RadialGradient, Stop } from "react
 interface KoiFishProps {
   size?: number;
   color?: "neon" | "galaxy" | "sakura" | "calico" | "fire" | "cloud" | "armor" | "gold";
+  level?: number;
 }
 
 const AnimatedG = Animated.createAnimatedComponent(G);
 
-export function KoiFish({ size = 80, color = "gold" }: KoiFishProps) {
+export function KoiFish({ size = 80, color = "gold", level = appState?.petStats?.level || 5 }: KoiFishProps) {
   const swimX = useRef(new Animated.Value(0)).current;
   const swimY = useRef(new Animated.Value(0)).current;
   const tailWag = useRef(new Animated.Value(0)).current;
   const bodyWiggle = useRef(new Animated.Value(0)).current;
 
-  // 8种锦鲤的颜色配置
+  // 8 Koi variation colors
   const colorSchemes = {
     neon: { body: "#111111", bodyGradient: "#2a2a2a", spots: "#00ffcc", belly: "#222", fin: "#00ffcc", eye: "#00ffcc", glow: "rgba(0, 255, 204, 0.4)" },
     galaxy: { body: "#1a0b2e", bodyGradient: "#3b1c66", spots: "#ffffff", belly: "#2d1650", fin: "#8a2be2", eye: "#fff", glow: "rgba(138, 43, 226, 0.4)" },
@@ -59,16 +61,29 @@ export function KoiFish({ size = 80, color = "gold" }: KoiFishProps) {
     return () => { swimAnimation.stop(); bobAnimation.stop(); tailAnimation.stop(); wiggleAnimation.stop(); };
   }, [swimX, swimY, tailWag, bodyWiggle]);
 
-  // SVG 的 rotation 需要纯数字
+  // SVG rotations
   const tailRotation = tailWag.interpolate({ inputRange: [-1, 1], outputRange: [-15, 15] }); 
-  
-  // 普通 View 的 rotate 需要带 deg 字符串
   const bodyRotation = bodyWiggle.interpolate({ inputRange: [-1, 1], outputRange: ["-3deg", "3deg"] });
+  const bodyRotationNum = bodyWiggle.interpolate({ inputRange: [-1, 1], outputRange: [-3, 3] });
 
   return (
     <Animated.View style={{ transform: [{ translateX: swimX }, { translateY: swimY }, { rotate: bodyRotation }], width: size, height: size * 0.6 }}>
-      {/* Glow effect */}
-      <View style={{ position: "absolute", width: size * 0.8, height: size * 0.5, left: size * 0.1, top: size * 0.05, backgroundColor: scheme.glow, borderRadius: size, opacity: 0.6 }} />
+      
+      {/* Glow effect: Scales up to 1.3x and slightly brighter when level > 5 */}
+      <View 
+        style={{ 
+          position: "absolute", 
+          width: size * 0.8, 
+          height: size * 0.5, 
+          left: size * 0.1, 
+          top: size * 0.05, 
+          backgroundColor: scheme.glow, 
+          borderRadius: size, 
+          opacity: level > 5 ? 0.8 : 0.6, 
+          transform: [{ scale: level > 5 ? 1.3 : 1 }] 
+        }} 
+      />
+
       <Svg width={size} height={size * 0.6} viewBox="0 0 100 60">
         <Defs>
           <RadialGradient id="bodyGradient" cx="50%" cy="30%" r="70%">
@@ -77,7 +92,6 @@ export function KoiFish({ size = 80, color = "gold" }: KoiFishProps) {
           </RadialGradient>
         </Defs>
         
-        {/* 这里使用 SVG 专属的动画属性，完美解决报错 */}
         <AnimatedG rotation={tailRotation} origin="75, 30">
           <Path d="M75 30 Q95 15 90 30 Q95 45 75 30" fill={scheme.fin} opacity={0.9} />
         </AnimatedG>
@@ -89,7 +103,6 @@ export function KoiFish({ size = 80, color = "gold" }: KoiFishProps) {
         <Circle cx="35" cy="25" r="8" fill={scheme.spots} opacity={0.8} />
         <Circle cx="55" cy="28" r="5" fill={scheme.spots} opacity={0.6} />
         
-        {/* 第三块斑纹：动态判断是否为 calico */}
         <Circle 
           cx="25" 
           cy="32" 
@@ -109,6 +122,22 @@ export function KoiFish({ size = 80, color = "gold" }: KoiFishProps) {
         <Path d="M10 32 Q12 34 10 36" stroke={scheme.body} strokeWidth="1.5" fill="none" />
         <Path d="M12 34 Q8 36 5 34" stroke={scheme.body} strokeWidth="1" fill="none" opacity={0.6} />
         <Path d="M12 35 Q8 38 5 37" stroke={scheme.body} strokeWidth="1" fill="none" opacity={0.6} />
+
+        {/* ✨ Level Up Equipment: Crown (Level 6+) */}
+        {level > 5 && (
+          <AnimatedG origin="20, 15" rotation={bodyRotationNum}>
+            <G transform="translate(15, 12) rotate(-15)">
+              {/* Crown Base */}
+              <Path d="M0 12 L-4 0 L4 6 L10 -2 L16 6 L24 0 L20 12 Z" fill="#FFD700" stroke="#DAA520" strokeWidth="1" strokeLinejoin="round" />
+              <Path d="M0 12 L20 12 L18 15 L2 15 Z" fill="#DAA520" />
+              {/* Jewels */}
+              <Circle cx="-4" cy="0" r="1.5" fill="#FF3366" />
+              <Circle cx="10" cy="-2" r="1.5" fill="#33CCFF" />
+              <Circle cx="24" cy="0" r="1.5" fill="#FF3366" />
+            </G>
+          </AnimatedG>
+        )}
+
       </Svg>
     </Animated.View>
   );

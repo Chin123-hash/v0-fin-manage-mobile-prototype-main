@@ -6,7 +6,7 @@ import {
   Gift, Lock, Check, Sparkles, Flame, RotateCw, Star, 
   TrendingUp, Ticket, ShoppingBag, ChevronRight, Trophy 
 } from "lucide-react-native";
-import { rewards, savingStats, petStats } from "@/lib/mock-data";
+import { rewards, savingStats} from "@/lib/mock-data";
 import { colors } from "@/lib/constants";
 import Animated, { 
   useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS 

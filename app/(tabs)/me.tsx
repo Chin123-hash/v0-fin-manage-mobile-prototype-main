@@ -6,7 +6,6 @@ import { DigitalTank } from "@/components/fin-manage/DigitalTank";
 import { 
   userProfile, 
   savingStats, 
-  rewards, 
   formatRM, 
   personaConfigs, 
   appState, 
@@ -32,6 +31,7 @@ export default function ProfileScreen() {
   // 🔥 State for synchronization with global appState
   const [hasPersona, setHasPersona] = useState(appState.hasFinishedQuiz);
   const [userPersona, setUserPersona] = useState<PersonaType>(appState.userPersona || "balancer");
+  const [tick, setTick] = useState(0); // 🔥 Forces re-render on tab focus
 
   // 🔥 Ensures the profile tab refreshes and unlocks the fish immediately after the quiz
   useFocusEffect(
@@ -40,6 +40,7 @@ export default function ProfileScreen() {
       if (appState.userPersona) {
         setUserPersona(appState.userPersona);
       }
+      setTick(t => t + 1); // Refresh UI to load new unlocked decorations/achievements
     }, [])
   );
 
@@ -151,7 +152,8 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-6 px-6">
-            {rewards.filter(r => r.isUnlocked).map((reward) => (
+            {/* 🔥 Use appState.rewards to ensure dynamic updates */}
+            {appState.rewards.filter(r => r.isUnlocked).map((reward) => (
               <View key={reward.id} className="items-center mr-6">
                 <View className="w-16 h-16 rounded-2xl bg-background-card items-center justify-center border border-accent/10 mb-2">
                   <Trophy size={28} color={colors.accent.gold} />
