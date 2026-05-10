@@ -12,7 +12,7 @@ interface TabIconProps {
   hasNotification?: boolean; // 🔥 Added this prop
 }
 
-function TabIcon({ focused, Icon, label }: TabIconProps) {
+function TabIcon({ focused, Icon, label, hasNotification }: TabIconProps) {
   return (
     <View className="items-center justify-center w-16 pt-1">
       <View className="relative">
