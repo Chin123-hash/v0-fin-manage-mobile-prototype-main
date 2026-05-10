@@ -134,9 +134,10 @@ export function KoiFish({ size = 80, color = "orange" }: KoiFishProps) {
     };
   }, [swimX, swimY, tailWag, bodyWiggle]);
 
+  // Use raw numbers for SVG rotation props instead of degree strings
   const tailRotation = tailWag.interpolate({
     inputRange: [-1, 1],
-    outputRange: ["-15deg", "15deg"],
+    outputRange: [-15, 15],
   });
 
   const bodyRotation = bodyWiggle.interpolate({
@@ -178,12 +179,11 @@ export function KoiFish({ size = 80, color = "orange" }: KoiFishProps) {
           </RadialGradient>
         </Defs>
 
-        {/* Tail fin - animated separately */}
+        {/* Tail fin - attributes passed directly as props instead of style */}
         <AnimatedG
-          style={{
-            transform: [{ rotate: tailRotation }],
-            transformOrigin: "75 30",
-          }}
+          rotation={tailRotation}
+          originX={75}
+          originY={30}
         >
           <Path
             d="M75 30 Q95 15 90 30 Q95 45 75 30"
