@@ -1,29 +1,32 @@
-import React, { useState } from "react";
+import React, { useCallback, useState, useRef} from "react";
 import { View, Text, ScrollView, TouchableOpacity, Alert, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 // 导入现有组件
-import { DigitalTank } from "@/components/fin-manage/DigitalTank";
+
 import { SavingStreak } from "@/components/fin-manage/SavingStreak";
 import { YieldMaximizer } from "@/components/fin-manage/YieldMaximizer";
 import { AIInsights } from "@/components/fin-manage/AIInsights";
 import { MentalAccounts } from "@/components/fin-manage/MentalAccounts";
 import { NudgeBanner } from "@/components/fin-manage/NudgeBanner";
 import { KoiFish } from "@/components/fin-manage/KoiFish";
+import { DigitalTank } from "@/components/fin-manage/DigitalTank"; // Assuming this exists based on V2
+import { GroupSavingCard } from "@/components/saving-plan/GroupSavingCard"; 
+import { ManageSavingPlan } from "@/components/fin-manage/ManageSavingPlan";
 
-// 导入 mock 数据和类型
+// Mock data and types (combined)
 import { 
   savingStats, 
   quizQuestions, 
   personaConfigs, 
   PersonaType, 
   type MentalAccount,
-  appState // 🔥 导入全局状态
+  appState 
 } from "@/lib/mock-data";
 
 // ==========================================
-// ✨ 精装修版主页组件 (Decorated Dashboard Widgets)
+// ✨ Decorated Dashboard Widgets (From V1)
 // ==========================================
 
 const MicroSavings = () => (
@@ -132,9 +135,7 @@ const GoalTimeline = () => (
   </View>
 );
 
-// ==========================================
-// 设定页面组件列表
-// ==========================================
+// Available Widgets Configuration
 const ALL_WIDGETS = [
   { id: "SavingStreak", title: "Saving Streak", desc: "Track consecutive saving days." },
   { id: "YieldMaximizer", title: "Yield Maximizer", desc: "Current interest & milestones." },
@@ -148,8 +149,9 @@ const ALL_WIDGETS = [
 
 export default function FinManageScreen() {
   const router = useRouter();
+  const scrollRef = useRef<ScrollView>(null);
   
-  // 状态管理
+  // V1 State (Persona & Widgets)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [userPersona, setUserPersona] = useState<PersonaType | null>(appState.userPersona);
@@ -158,7 +160,31 @@ export default function FinManageScreen() {
   const [showResultModal, setShowResultModal] = useState(false);
   const [mentalAccounts, setMentalAccounts] = useState<MentalAccount[]>([]);
 
-  // 🔥 处理问卷答题逻辑
+  // V2 State (Saving Plan tracking)
+  const [isPlanActive, setIsPlanActive] = useState(appState.isPersonalPlanActive);
+  const [currentStreak, setCurrentStreak] = useState(savingStats.streak);
+
+  // Sync V2 state on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      const previouslyActive = isPlanActive;
+      const currentlyActive = appState.isPersonalPlanActive;
+
+      setIsPlanActive(currentlyActive);
+      setCurrentStreak(currentlyActive ? savingStats.streak : 0);
+
+      if (!previouslyActive && currentlyActive) {
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+      }
+    }, [isPlanActive])
+  );
+
+  const handleRefresh = () => {
+    setIsPlanActive(appState.isPersonalPlanActive);
+    if (!appState.isPersonalPlanActive) setCurrentStreak(0);
+  };
+
+  // 🔥 Handle Quiz Logic (V1)
   const handleAnswer = (tags: string[], points: number) => {
     const newScores = { ...scores };
     tags.forEach(tag => {
@@ -178,7 +204,7 @@ export default function FinManageScreen() {
         }
       });
 
-      // 🔥 更新全局状态
+      // Update global state
       appState.userPersona = topPersona;
       appState.hasFinishedQuiz = true;
 
@@ -193,36 +219,6 @@ export default function FinManageScreen() {
     }
   };
 
-  const handleAddAccount = (name: string) => {
-    const availableThemes: MentalAccount["theme"][] = ["travel", "shopping", "food", "emergency"];
-    const randomTheme = availableThemes[Math.floor(Math.random() * availableThemes.length)];
-    const iconMap: Record<string, string> = { travel: "plane", shopping: "shoe", food: "utensils", emergency: "shield" };
-  
-    const newAcc: MentalAccount = {
-      id: Date.now().toString(),
-      name: name,
-      balance: 0,
-      target: 1000,
-      theme: randomTheme,
-      icon: iconMap[randomTheme] || "wallet",
-      description: "New savings goal"
-    };
-    setMentalAccounts([...mentalAccounts, newAcc]);
-  };
-
-  const handleDeleteAccount = (id: string) => {
-    if (id === "daily") return;
-    setMentalAccounts(mentalAccounts.filter(a => a.id !== id));
-  };
-
-  const moveWidget = (index: number, direction: 'up' | 'down') => {
-    const newLayout = [...activeLayout];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= newLayout.length) return;
-    [newLayout[index], newLayout[targetIndex]] = [newLayout[targetIndex], newLayout[index]];
-    setActiveLayout(newLayout);
-  };
-
   const toggleWidget = (widgetId: string) => {
     if (activeLayout.includes(widgetId)) {
       setActiveLayout(activeLayout.filter(id => id !== widgetId));
@@ -235,11 +231,7 @@ export default function FinManageScreen() {
     }
   };
 
-  const handleNavigateToPetHub = () => {
-    router.push("/pet-hub");
-  };
-
-  // 1. 问卷答题界面
+  // 1. Quiz Interface
   if (!userPersona) {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     return (
@@ -260,9 +252,7 @@ export default function FinManageScreen() {
     );
   }
 
-  const config = personaConfigs[userPersona];
-
-  // 2. 编辑排版界面
+  // 2. Edit Layout Interface (Completed)
   if (isEditing) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
@@ -270,6 +260,92 @@ export default function FinManageScreen() {
           <View>
             <Text className="text-foreground font-bold text-xl">Edit Layout</Text>
             <Text className="text-foreground-muted text-xs">{activeLayout.length}/4 Selected</Text>
+          </View>
+          <TouchableOpacity onPress={() => setIsEditing(false)}>
+            <Text className="text-accent font-bold text-base">Done</Text>
+          </TouchableOpacity>
+        </View>
+        
+        <ScrollView className="flex-1 px-4 py-2">
+          {ALL_WIDGETS.map((widget) => (
+            <View key={widget.id} className="flex-row justify-between items-center py-4 border-b border-border/50">
+              <View className="flex-1 pr-4">
+                <Text className="text-foreground font-bold text-base mb-1">{widget.title}</Text>
+                <Text className="text-foreground-muted text-xs">{widget.desc}</Text>
+              </View>
+              <TouchableOpacity 
+                onPress={() => toggleWidget(widget.id)}
+                className={`px-4 py-2 rounded-full border ${activeLayout.includes(widget.id) ? 'bg-red-500/10 border-red-500/30' : 'bg-accent/10 border-accent/30'}`}
+              >
+                <Text className={activeLayout.includes(widget.id) ? 'text-red-500 font-bold text-xs' : 'text-accent font-bold text-xs'}>
+                  {activeLayout.includes(widget.id) ? 'Remove' : 'Add'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // 3. Main Dashboard (Merged V1 & V2)
+  return (
+    <SafeAreaView className="flex-1 bg-background" edges={["top", "bottom"]}>
+      <ScrollView
+        ref={scrollRef}
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
+        {/* Header & Edit Button */}
+        <View className="px-4 py-4 flex-row justify-between items-center">
+          <View>
+            <Text className="text-foreground font-bold text-2xl">Fin Manage</Text>
+            <Text className="text-foreground-muted text-sm">
+              Your financial wellness companion
+            </Text>
+          </View>
+          <TouchableOpacity onPress={() => setIsEditing(true)}>
+             <Text className="text-accent font-bold text-sm bg-accent/10 px-3 py-1.5 rounded-full">Customize</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Pet / Tank Section (From V2) */}
+        <View className="mx-4 mb-4 relative rounded-3xl overflow-hidden">
+          <DigitalTank height={180} />
+          <View className="absolute bottom-2 left-2 bg-background/80 rounded-lg px-3 py-1 shadow-sm">
+            <Text className="text-accent text-xs font-semibold">Kira the Koi</Text>
+          </View>
+        </View>
+
+        {/* Primary Goal Tracking Component (From V2) */}
+        <View className="px-4 mb-4">
+           <ManageSavingPlan isActive={isPlanActive} streak={currentStreak} onRefresh={handleRefresh} />
+        </View>
+
+        {/* Dynamic Widgets Render Engine (From V1) */}
+        <View className="px-4 mt-2">
+          {activeLayout.map((widgetId) => {
+            switch(widgetId) {
+              case "MicroSavings": return <MicroSavings key={widgetId} />;
+              case "GroupSavings": return <GroupSavings key={widgetId} />;
+              case "ExpenseRadar": return <ExpenseRadar key={widgetId} />;
+              case "GoalTimeline": return <GoalTimeline key={widgetId} />;
+              // Fallback for widgets not yet implemented in V1 UI block
+              default: return (
+                <View key={widgetId} className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm justify-center items-center h-24">
+                  <Text className="text-foreground-muted font-medium">{ALL_WIDGETS.find(w => w.id === widgetId)?.title || widgetId}</Text>
+                  <Text className="text-foreground-muted text-xs mt-1">Component Coming Soon</Text>
+                </View>
+              );
+            }
+          })}
+        </View>
+
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
           </View>
           <TouchableOpacity className="bg-accent px-4 py-2 rounded-full" onPress={() => setIsEditing(false)}>
             <Text className="text-white text-sm font-bold">Done</Text>
@@ -388,6 +464,8 @@ export default function FinManageScreen() {
               <Text className="text-white font-bold text-lg">Awesome, let's go!</Text>
             </TouchableOpacity>
           </View>
+        <View className="mb-4">
+          <SavingStreak streak={currentStreak} />
         </View>
       </Modal>
 
@@ -427,6 +505,36 @@ export default function FinManageScreen() {
         <View className="mx-4 mt-2 mb-4">
           <NudgeBanner onPress={() => router.push("/saving-plan")} />
         </View>
+        {/* 1. Show Editor when active (replaces NudgeBanner) */}
+        {isPlanActive && <ManageSavingPlan onUpdate={handleRefresh} />}
+
+        {/* 2. Group Saving: Hidden until plan is active */}
+        {isPlanActive && (
+          <View className="px-4 mb-4">
+            {/* Group Saving Card: Independent joined state */}
+            <GroupSavingCard />
+          </View>
+        )}
+
+        <View className="mb-4">
+          <YieldMaximizer
+            currentSavings={savingStats.currentSavings}
+            currentRate={isPlanActive ? 4.0 : 3.5}
+          />
+        </View>
+
+        <View className="mb-4">
+          <AIInsights />
+        </View>
+
+        <MentalAccounts />
+
+        {/* 3. Nudge Banner: Visible only if no plan is active */}
+        {!isPlanActive && (
+          <View className="mt-2 mb-4">
+            <NudgeBanner onPress={() => router.push("/saving-plan")} />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

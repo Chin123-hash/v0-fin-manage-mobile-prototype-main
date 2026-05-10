@@ -237,12 +237,21 @@ export function calculateProgress(current: number, target: number): number {
   return Math.min((current / target) * 100, 100);
 }
 
-
-// lib/quiz-data.ts
+// lib/mock-data.ts (or lib/quiz-data.ts)
 
 export type PersonaType = 'dataGeek' | 'visionary' | 'social' | 'micro' | 'impulse' | 'zen' | 'guardian' | 'balancer';
 
-// 在 lib/mock-data.ts 中更新
+// Define MentalAccount interface if not already defined elsewhere
+export interface MentalAccount {
+  id: string;
+  name: string;
+  balance: number;
+  target: number;
+  theme: string;
+  icon: string;
+  description: string;
+}
+
 export const personaConfigs: Record<PersonaType, { name: string; fishColor: string; defaultLayout: string[]; analysis: string; defaultAccounts: MentalAccount[] }> = {
   dataGeek: { 
     name: "The Data Geek", 
@@ -382,7 +391,54 @@ export const quizQuestions = [
   }
 ];
 
+export interface Contact {
+  id: string;
+  name: string;
+  phone: string;
+}
+
+export const fakeContacts: Contact[] = [
+  { id: '1', name: 'Anis Najwa', phone: '012-3456789' },
+  { id: '2', name: 'Aina Tasnim', phone: '011-9876543' },
+  { id: '3', name: 'Mei Ling', phone: '017-2233445' },
+  { id: '4', name: 'Raj', phone: '019-5566778' },
+];
+
+export const groupRewards = [
+  { target: 10000, reward: "Special Gold Fin for Kira", type: "decoration" },
+  { target: 15000, reward: "+0.5% p.a. Interest Bonus", type: "interest" },
+];
+
+export interface GroupInstance {
+  id: string;
+  name: string;
+  balance: number;
+  members: GroupMember[];
+}
+
+export interface GroupMember {
+  id: string;
+  name: string;
+  initials: string;
+  color: string;
+  phone?: string; 
+}
+
+// 🔥 Merged global-ish state for the prototype
 export const appState = {
+  // From V1 (Quiz & Persona state)
   userPersona: null as PersonaType | null,
   hasFinishedQuiz: false,
+  
+  // From V2 (Saving Plan & Group state)
+  isPersonalPlanActive: false,
+  isGroupSavingActive: false, 
+  groups: [] as GroupInstance[], 
+  groupPocketBalance: 0.0,
+  targetAmount: 10000.0,
+  activePlan: {
+    microSavingAmount: 10,
+    autoSaveAmount: 10,
+    autoSaveTrigger: 100,
+  }
 };
