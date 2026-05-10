@@ -241,16 +241,6 @@ export function calculateProgress(current: number, target: number): number {
 
 export type PersonaType = 'dataGeek' | 'visionary' | 'social' | 'micro' | 'impulse' | 'zen' | 'guardian' | 'balancer';
 
-// Define MentalAccount interface if not already defined elsewhere
-export interface MentalAccount {
-  id: string;
-  name: string;
-  balance: number;
-  target: number;
-  theme: string;
-  icon: string;
-  description: string;
-}
 
 export const personaConfigs: Record<PersonaType, { name: string; fishColor: string; defaultLayout: string[]; analysis: string; defaultAccounts: MentalAccount[] }> = {
   dataGeek: { 

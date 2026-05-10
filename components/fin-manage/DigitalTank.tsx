@@ -74,11 +74,10 @@ function Bubble({ delay, left, size }: BubbleProps) {
 interface DigitalTankProps {
   height?: number;
   showFullTank?: boolean;
-// 1. Added koiColor property to synchronize with persona quiz results
   koiColor?: string;
-  isFullScreen?: boolean; // New prop for full screen
-  hideFish?: boolean;      // New prop to make it empty
-  children?: React.ReactNode; // Allow overlays
+  isFullScreen?: boolean;
+  hideFish?: boolean;
+  children?: React.ReactNode; 
 }
 
 /**
@@ -87,13 +86,13 @@ interface DigitalTankProps {
 export function DigitalTank({ 
   height = 200, 
   showFullTank = false, 
-  
   isFullScreen = false,
   hideFish = false,
-  children
+  koiColor = "gold", // FIX: Destructured koiColor here with a default
+  children           // FIX: Destructured children here
 }: DigitalTankProps) {
-  // Configurable bubble positions and delays
 
+  // Configurable bubble positions and delays
   const bubbles = [
     { delay: 0, left: 15, size: 6 },
     { delay: 800, left: 30, size: 8 },
@@ -112,7 +111,7 @@ export function DigitalTank({
   return (
     <View
       className="w-full overflow-hidden rounded-3xl"
-      style={{ height: showFullTank ? height * 2 : height }}
+      style={containerStyle}
     >
       <LinearGradient
         colors={["#0a2a3a", "#0d3347", "#1a4a5a", "#0d3347"]}
@@ -159,21 +158,22 @@ export function DigitalTank({
           <Bubble key={index} {...bubble} />
         ))}
 
-        {/* Primary Koi Fish (Kira) - positioned in tank */}
-        <View
-          style={{
-            position: "absolute",
-            top: "30%",
-            left: "50%",
-            transform: [{ translateX: -40 }],
-          }}
-        >
-          {/* 3. Passing the dynamic koiColor to the fish component */}
-          <KoiFish size={80} color={koiColor as any} />
-        </View>
+        {/* Primary Koi Fish (Kira) - hidden if hideFish is true */}
+        {!hideFish && (
+          <View
+            style={{
+              position: "absolute",
+              top: "30%",
+              left: "50%",
+              transform: [{ translateX: -40 }],
+            }}
+          >
+            <KoiFish size={80} color={koiColor as any} />
+          </View>
+        )}
 
-        {/* Second Koi for full tank (Social view) */}
-        {showFullTank && (
+        {/* Second Koi for full tank (Social view) - hidden if hideFish is true */}
+        {!hideFish && showFullTank && (
           <View
             style={{
               position: "absolute",
@@ -207,13 +207,11 @@ export function DigitalTank({
           <View style={[styles.seaweed, { height: 38, transform: [{ rotate: "-7deg" }] }]} />
         </View>
 
-        {/* Plants and Sandy Bottom */}
-        <View style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, flexDirection: "row", justifyContent: "space-around", alignItems: "flex-end", paddingHorizontal: 16 }}>
-          {[35, 25, 40, 30, 38].map((h, i) => (
-            <View key={i} style={{ width: 8, height: h, backgroundColor: "#00f5d4", opacity: 0.3, borderTopLeftRadius: 20, borderTopRightRadius: 20 }} />
-          ))}
-        </View>
         <LinearGradient colors={["transparent", "rgba(45, 27, 78, 0.5)"]} style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 20 }} />
+        
+        {/* FIX: Render children so overlays passed into DigitalTank will show up */}
+        {children}
+        
       </LinearGradient>
     </View>
   );

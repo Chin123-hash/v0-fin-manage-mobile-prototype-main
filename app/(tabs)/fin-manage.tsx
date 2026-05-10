@@ -1,21 +1,20 @@
-import React, { useCallback, useState, useRef} from "react";
+import React, { useCallback, useState, useRef } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Alert, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useRouter } from "expo-router";
 
-// 导入现有组件
-
+// Existing Components
 import { SavingStreak } from "@/components/fin-manage/SavingStreak";
 import { YieldMaximizer } from "@/components/fin-manage/YieldMaximizer";
 import { AIInsights } from "@/components/fin-manage/AIInsights";
 import { MentalAccounts } from "@/components/fin-manage/MentalAccounts";
 import { NudgeBanner } from "@/components/fin-manage/NudgeBanner";
 import { KoiFish } from "@/components/fin-manage/KoiFish";
-import { DigitalTank } from "@/components/fin-manage/DigitalTank"; // Assuming this exists based on V2
+import { DigitalTank } from "@/components/fin-manage/DigitalTank"; 
 import { GroupSavingCard } from "@/components/saving-plan/GroupSavingCard"; 
 import { ManageSavingPlan } from "@/components/fin-manage/ManageSavingPlan";
 
-// Mock data and types (combined)
+// Mock data and types
 import { 
   savingStats, 
   quizQuestions, 
@@ -26,7 +25,7 @@ import {
 } from "@/lib/mock-data";
 
 // ==========================================
-// ✨ Decorated Dashboard Widgets (From V1)
+// ✨ Decorated Dashboard Widgets
 // ==========================================
 
 const MicroSavings = () => (
@@ -135,7 +134,6 @@ const GoalTimeline = () => (
   </View>
 );
 
-// Available Widgets Configuration
 const ALL_WIDGETS = [
   { id: "SavingStreak", title: "Saving Streak", desc: "Track consecutive saving days." },
   { id: "YieldMaximizer", title: "Yield Maximizer", desc: "Current interest & milestones." },
@@ -151,7 +149,7 @@ export default function FinManageScreen() {
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   
-  // V1 State (Persona & Widgets)
+  // V1 State
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [userPersona, setUserPersona] = useState<PersonaType | null>(appState.userPersona);
@@ -160,11 +158,10 @@ export default function FinManageScreen() {
   const [showResultModal, setShowResultModal] = useState(false);
   const [mentalAccounts, setMentalAccounts] = useState<MentalAccount[]>([]);
 
-  // V2 State (Saving Plan tracking)
+  // V2 State 
   const [isPlanActive, setIsPlanActive] = useState(appState.isPersonalPlanActive);
   const [currentStreak, setCurrentStreak] = useState(savingStats.streak);
 
-  // Sync V2 state on screen focus
   useFocusEffect(
     useCallback(() => {
       const previouslyActive = isPlanActive;
@@ -184,7 +181,35 @@ export default function FinManageScreen() {
     if (!appState.isPersonalPlanActive) setCurrentStreak(0);
   };
 
-  // 🔥 Handle Quiz Logic (V1)
+  const handleNavigateToPetHub = () => {
+    router.push("/pet-hub");
+  };
+
+  const moveWidget = (index: number, direction: 'up' | 'down') => {
+    const newLayout = [...activeLayout];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newLayout.length) return;
+    [newLayout[index], newLayout[targetIndex]] = [newLayout[targetIndex], newLayout[index]];
+    setActiveLayout(newLayout);
+  };
+
+  const handleAddAccount = (name: string) => {
+    const newAcc: MentalAccount = {
+      id: Date.now().toString(),
+      name: name,
+      balance: 0,
+      target: 1000,
+      theme: "neutral",
+      icon: "wallet",
+      description: "New Account"
+    };
+    setMentalAccounts([...mentalAccounts, newAcc]);
+  };
+
+  const handleDeleteAccount = (id: string) => {
+    setMentalAccounts(mentalAccounts.filter(a => a.id !== id));
+  };
+
   const handleAnswer = (tags: string[], points: number) => {
     const newScores = { ...scores };
     tags.forEach(tag => {
@@ -204,7 +229,6 @@ export default function FinManageScreen() {
         }
       });
 
-      // Update global state
       appState.userPersona = topPersona;
       appState.hasFinishedQuiz = true;
 
@@ -252,7 +276,9 @@ export default function FinManageScreen() {
     );
   }
 
-  // 2. Edit Layout Interface (Completed)
+  const config = personaConfigs[userPersona];
+
+  // 2. Advanced Edit Layout Interface
   if (isEditing) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
@@ -260,92 +286,6 @@ export default function FinManageScreen() {
           <View>
             <Text className="text-foreground font-bold text-xl">Edit Layout</Text>
             <Text className="text-foreground-muted text-xs">{activeLayout.length}/4 Selected</Text>
-          </View>
-          <TouchableOpacity onPress={() => setIsEditing(false)}>
-            <Text className="text-accent font-bold text-base">Done</Text>
-          </TouchableOpacity>
-        </View>
-        
-        <ScrollView className="flex-1 px-4 py-2">
-          {ALL_WIDGETS.map((widget) => (
-            <View key={widget.id} className="flex-row justify-between items-center py-4 border-b border-border/50">
-              <View className="flex-1 pr-4">
-                <Text className="text-foreground font-bold text-base mb-1">{widget.title}</Text>
-                <Text className="text-foreground-muted text-xs">{widget.desc}</Text>
-              </View>
-              <TouchableOpacity 
-                onPress={() => toggleWidget(widget.id)}
-                className={`px-4 py-2 rounded-full border ${activeLayout.includes(widget.id) ? 'bg-red-500/10 border-red-500/30' : 'bg-accent/10 border-accent/30'}`}
-              >
-                <Text className={activeLayout.includes(widget.id) ? 'text-red-500 font-bold text-xs' : 'text-accent font-bold text-xs'}>
-                  {activeLayout.includes(widget.id) ? 'Remove' : 'Add'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  // 3. Main Dashboard (Merged V1 & V2)
-  return (
-    <SafeAreaView className="flex-1 bg-background" edges={["top", "bottom"]}>
-      <ScrollView
-        ref={scrollRef}
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 24 }}
-      >
-        {/* Header & Edit Button */}
-        <View className="px-4 py-4 flex-row justify-between items-center">
-          <View>
-            <Text className="text-foreground font-bold text-2xl">Fin Manage</Text>
-            <Text className="text-foreground-muted text-sm">
-              Your financial wellness companion
-            </Text>
-          </View>
-          <TouchableOpacity onPress={() => setIsEditing(true)}>
-             <Text className="text-accent font-bold text-sm bg-accent/10 px-3 py-1.5 rounded-full">Customize</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Pet / Tank Section (From V2) */}
-        <View className="mx-4 mb-4 relative rounded-3xl overflow-hidden">
-          <DigitalTank height={180} />
-          <View className="absolute bottom-2 left-2 bg-background/80 rounded-lg px-3 py-1 shadow-sm">
-            <Text className="text-accent text-xs font-semibold">Kira the Koi</Text>
-          </View>
-        </View>
-
-        {/* Primary Goal Tracking Component (From V2) */}
-        <View className="px-4 mb-4">
-           <ManageSavingPlan isActive={isPlanActive} streak={currentStreak} onRefresh={handleRefresh} />
-        </View>
-
-        {/* Dynamic Widgets Render Engine (From V1) */}
-        <View className="px-4 mt-2">
-          {activeLayout.map((widgetId) => {
-            switch(widgetId) {
-              case "MicroSavings": return <MicroSavings key={widgetId} />;
-              case "GroupSavings": return <GroupSavings key={widgetId} />;
-              case "ExpenseRadar": return <ExpenseRadar key={widgetId} />;
-              case "GoalTimeline": return <GoalTimeline key={widgetId} />;
-              // Fallback for widgets not yet implemented in V1 UI block
-              default: return (
-                <View key={widgetId} className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm justify-center items-center h-24">
-                  <Text className="text-foreground-muted font-medium">{ALL_WIDGETS.find(w => w.id === widgetId)?.title || widgetId}</Text>
-                  <Text className="text-foreground-muted text-xs mt-1">Component Coming Soon</Text>
-                </View>
-              );
-            }
-          })}
-        </View>
-
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
           </View>
           <TouchableOpacity className="bg-accent px-4 py-2 rounded-full" onPress={() => setIsEditing(false)}>
             <Text className="text-white text-sm font-bold">Done</Text>
@@ -425,9 +365,10 @@ export default function FinManageScreen() {
     );
   }
 
+  // 3. Dynamic Dictionary
   const widgetDictionary: Record<string, React.ReactNode> = {
-    SavingStreak: <View className="mb-4" key="streak"><SavingStreak streak={savingStats.streak} /></View>,
-    YieldMaximizer: <View className="mb-4" key="yield"><YieldMaximizer currentSavings={savingStats.currentSavings} currentRate={savingStats.interestRate} /></View>,
+    SavingStreak: <View className="mb-4" key="streak"><SavingStreak streak={currentStreak} /></View>,
+    YieldMaximizer: <View className="mb-4" key="yield"><YieldMaximizer currentSavings={savingStats.currentSavings} currentRate={isPlanActive ? 4.0 : 3.5} /></View>,
     AIInsights: <View className="mb-4" key="ai"><AIInsights /></View>,
     MentalAccounts: (
       <MentalAccounts 
@@ -443,6 +384,7 @@ export default function FinManageScreen() {
     GoalTimeline: <GoalTimeline key="timeline" />,
   };
 
+  // 4. Main Dashboard
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <Modal animationType="fade" transparent={true} visible={showResultModal} onRequestClose={() => setShowResultModal(false)}>
@@ -464,12 +406,10 @@ export default function FinManageScreen() {
               <Text className="text-white font-bold text-lg">Awesome, let's go!</Text>
             </TouchableOpacity>
           </View>
-        <View className="mb-4">
-          <SavingStreak streak={currentStreak} />
         </View>
       </Modal>
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+      <ScrollView ref={scrollRef} className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View className="px-4 py-4 flex-row justify-between items-center">
           <View>
             <Text className="text-foreground font-bold text-2xl">Fin Manage</Text>
@@ -480,11 +420,10 @@ export default function FinManageScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Interactive Dashboard Tank (Portal to Pet Hub) */}
         <TouchableOpacity 
           onPress={handleNavigateToPetHub}
           activeOpacity={0.9}
-          className="mx-4 mb-4 shadow-xl shadow-black/40"
+          className="mx-4 mb-4 shadow-xl shadow-black/40 relative overflow-hidden rounded-3xl"
         >
           <DigitalTank height={180} koiColor={config.fishColor} /> 
           <View className="absolute bottom-2 left-2 bg-background/80 rounded-lg px-3 py-1 border border-accent/10">
@@ -492,8 +431,22 @@ export default function FinManageScreen() {
           </View>
         </TouchableOpacity>
 
+        {isPlanActive && (
+          <View className="px-4 mb-4">
+          <ManageSavingPlan onUpdate={handleRefresh} />             
+          <View className="mt-4">
+               <GroupSavingCard />
+             </View>
+          </View>
+        )}
+
         <View className="px-4">
-          {activeLayout.map(widgetName => widgetDictionary[widgetName])}
+          {activeLayout.map(widgetName => widgetDictionary[widgetName] || (
+             <View key={widgetName} className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm justify-center items-center h-24">
+               <Text className="text-foreground-muted font-medium">{ALL_WIDGETS.find(w => w.id === widgetName)?.title || widgetName}</Text>
+               <Text className="text-foreground-muted text-xs mt-1">Component Coming Soon</Text>
+             </View>
+          ))}
         </View>
 
         {activeLayout.length < 4 && (
@@ -502,36 +455,8 @@ export default function FinManageScreen() {
           </TouchableOpacity>
         )}
 
-        <View className="mx-4 mt-2 mb-4">
-          <NudgeBanner onPress={() => router.push("/saving-plan")} />
-        </View>
-        {/* 1. Show Editor when active (replaces NudgeBanner) */}
-        {isPlanActive && <ManageSavingPlan onUpdate={handleRefresh} />}
-
-        {/* 2. Group Saving: Hidden until plan is active */}
-        {isPlanActive && (
-          <View className="px-4 mb-4">
-            {/* Group Saving Card: Independent joined state */}
-            <GroupSavingCard />
-          </View>
-        )}
-
-        <View className="mb-4">
-          <YieldMaximizer
-            currentSavings={savingStats.currentSavings}
-            currentRate={isPlanActive ? 4.0 : 3.5}
-          />
-        </View>
-
-        <View className="mb-4">
-          <AIInsights />
-        </View>
-
-        <MentalAccounts />
-
-        {/* 3. Nudge Banner: Visible only if no plan is active */}
         {!isPlanActive && (
-          <View className="mt-2 mb-4">
+          <View className="mx-4 mt-2 mb-4">
             <NudgeBanner onPress={() => router.push("/saving-plan")} />
           </View>
         )}
