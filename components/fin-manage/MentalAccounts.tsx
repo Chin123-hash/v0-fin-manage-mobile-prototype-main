@@ -1,17 +1,21 @@
-import React from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Wallet, Plane, ShoppingBag, Shield, ChevronRight } from "lucide-react-native";
-import { mentalAccounts, formatRM, calculateProgress, type MentalAccount } from "@/lib/mock-data";
+// Fixed: Added PlusCircle to the main import block
+import { Wallet, Plane, ShoppingBag, Shield, X, Plus, Utensils, PlusCircle } from "lucide-react-native";
+import { formatRM, calculateProgress, type MentalAccount } from "@/lib/mock-data";
 import { colors } from "@/lib/constants";
 
+// Icon mapping
 const iconMap: Record<string, React.ElementType> = {
   wallet: Wallet,
   plane: Plane,
   shoe: ShoppingBag,
   shield: Shield,
+  utensils: Utensils,
 };
 
+// Theme gradients
 const themeGradients: Record<string, [string, string]> = {
   neutral: [colors.background.card, colors.background.cardLight],
   travel: ["#1a3a5c", "#2d5a8a"],
@@ -22,93 +26,145 @@ const themeGradients: Record<string, [string, string]> = {
 
 interface MentalAccountCardProps {
   account: MentalAccount;
+  onDelete?: (id: string) => void;
 }
 
-function MentalAccountCard({ account }: MentalAccountCardProps) {
+function MentalAccountCard({ account, onDelete }: MentalAccountCardProps) {
   const Icon = iconMap[account.icon] || Wallet;
   const gradient = themeGradients[account.theme] || themeGradients.neutral;
-  const progress = account.target
-    ? calculateProgress(account.balance, account.target)
-    : null;
+  const progress = account.target ? calculateProgress(account.balance, account.target) : null;
 
   return (
-    <TouchableOpacity activeOpacity={0.8}>
+    <View style={{ marginRight: 12 }}>
       <LinearGradient
         colors={gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
           width: 160,
-          borderRadius: 16,
+          borderRadius: 24,
           padding: 16,
-          marginRight: 12,
+          height: 180,
         }}
       >
-        {/* Icon */}
-        <View className="w-10 h-10 rounded-full bg-white/10 items-center justify-center mb-3">
-          <Icon size={20} color={colors.accent.teal} />
+        <View className="flex-row justify-between items-start mb-3">
+          <View className="w-10 h-10 rounded-full bg-white/10 items-center justify-center">
+            <Icon size={20} color={account.theme === "neutral" ? colors.accent.teal : "white"} />
+          </View>
+          
+          {/* Locked accounts that cannot be deleted */}
+          {account.id !== "daily" && account.id !== "1" && (
+            <TouchableOpacity 
+              onPress={() => onDelete?.(account.id)}
+              className="bg-black/20 p-1.5 rounded-full"
+            >
+              <X size={12} color="white" />
+            </TouchableOpacity>
+          )}
         </View>
 
-        {/* Account name */}
-        <Text className="text-foreground font-semibold text-sm mb-1" numberOfLines={1}>
+        <Text className="text-white font-semibold text-sm mb-1" numberOfLines={1}>
           {account.name}
         </Text>
 
-        {/* Balance */}
-        <Text className="text-foreground font-bold text-lg mb-2">
+        <Text className="text-white font-bold text-lg mb-2">
           {formatRM(account.balance)}
         </Text>
 
-        {/* Progress bar (if has target) */}
-        {progress !== null && account.target && (
-          <View>
-            <View className="h-1.5 bg-white/20 rounded-full overflow-hidden mb-1">
-              <View
-                className="h-full bg-accent rounded-full"
-                style={{ width: `${progress}%` }}
-              />
+        <View className="mt-auto">
+          {progress !== null && account.target ? (
+            <View>
+              <View className="h-1.5 bg-white/20 rounded-full overflow-hidden mb-1">
+                <View
+                  className="h-full bg-accent rounded-full"
+                  style={{ width: `${progress}%` }}
+                />
+              </View>
+              <Text className="text-white/60 text-[10px]">
+                {progress.toFixed(0)}% to Goal
+              </Text>
             </View>
-            <Text className="text-foreground-muted text-xs">
-              {progress.toFixed(0)}% of {formatRM(account.target)}
-            </Text>
-          </View>
-        )}
-
-        {/* Description for accounts without target */}
-        {!account.target && account.description && (
-          <Text className="text-foreground-muted text-xs">{account.description}</Text>
-        )}
+          ) : (
+            <Text className="text-white/60 text-[10px]">{account.description}</Text>
+          )}
+        </View>
       </LinearGradient>
-    </TouchableOpacity>
+    </View>
   );
 }
 
-export function MentalAccounts() {
+interface MentalAccountsProps {
+  accounts: MentalAccount[];
+  onAddAccount: (name: string) => void;
+  onDeleteAccount: (id: string) => void;
+}
+
+export function MentalAccounts({ accounts, onAddAccount, onDeleteAccount }: MentalAccountsProps) {
+  const [isAdding, setIsAdding] = useState(false);
+  const [text, setText] = useState("");
+
+  const handleCreate = () => {
+    if (text.trim()) {
+      onAddAccount(text.trim());
+      setText("");
+      setIsAdding(false);
+    }
+  };
+
   return (
-    <View className="mb-4">
-      {/* Header */}
-      <View className="flex-row items-center justify-between mx-4 mb-3">
+    <View className="mb-6">
+      <View className="flex-row items-center justify-between mx-4 mb-4">
         <View>
-          <Text className="text-foreground font-bold text-base">Mental Accounts</Text>
-          <Text className="text-foreground-muted text-sm">
-            Organize your money by goals
-          </Text>
+          <Text className="text-foreground font-bold text-lg">Mental Accounts</Text>
+          <Text className="text-foreground-muted text-xs">Organize your money by goals</Text>
         </View>
-        <TouchableOpacity className="flex-row items-center">
-          <Text className="text-accent text-sm mr-1">See all</Text>
-          <ChevronRight size={16} color={colors.accent.teal} />
+        <TouchableOpacity 
+          onPress={() => setIsAdding(!isAdding)}
+          className="flex-row items-center bg-accent/10 px-3 py-1.5 rounded-full"
+        >
+          <Plus size={14} color={colors.accent.teal} />
+          <Text className="text-accent text-xs font-bold ml-1">
+            {isAdding ? "Cancel" : "Add Account"}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Horizontal scroll of cards */}
+      {isAdding && (
+        <View className="mx-4 mb-4 flex-row items-center bg-background-card p-2 rounded-2xl border border-accent/30 shadow-sm">
+          <TextInput
+            placeholder="Account name (e.g. Travel)"
+            placeholderTextColor="#666"
+            className="flex-1 px-3 text-foreground py-2"
+            value={text}
+            onChangeText={setText}
+            autoFocus
+          />
+          <TouchableOpacity onPress={handleCreate} className="bg-accent px-4 py-2 rounded-xl">
+            <Text className="text-white font-bold text-xs">Create</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingLeft: 16, paddingRight: 4 }}
+        contentContainerStyle={{ paddingLeft: 24, paddingRight: 12 }}
       >
-        {mentalAccounts.map((account) => (
-          <MentalAccountCard key={account.id} account={account} />
+        {accounts.map((account) => (
+          <MentalAccountCard key={account.id} account={account} onDelete={onDeleteAccount} />
         ))}
+        
+        {/* Fixed: PlusCircle is now correctly imported and scoped here */}
+        <TouchableOpacity 
+          className="w-40 bg-background-card rounded-[24px] p-4 items-center justify-center border border-dashed border-accent/30"
+          activeOpacity={0.7}
+          onPress={() => setIsAdding(true)}
+        >
+          <View className="w-10 h-10 rounded-full bg-accent/10 items-center justify-center mb-2">
+            <PlusCircle size={24} color={colors.accent.teal} />
+          </View>
+          <Text className="text-foreground text-xs font-bold">New Account</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
