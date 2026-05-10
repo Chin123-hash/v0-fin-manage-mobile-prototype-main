@@ -29,8 +29,8 @@ import {
 // ==========================================
 
 const MicroSavings = () => (
-  <View className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
-    <View className="flex-row justify-between items-center mb-4">
+  <View className="bg-background-card border border-border rounded-3xl p-5 shadow-sm h-[200px] flex-col justify-between">
+    <View className="flex-row justify-between items-center">
       <View>
         <Text className="text-foreground font-bold text-lg">Micro Savings</Text>
         <Text className="text-foreground-muted text-xs mt-1">Skip a treat, boost your wealth</Text>
@@ -39,61 +39,28 @@ const MicroSavings = () => (
         <Text className="text-accent text-xl">☕</Text>
       </View>
     </View>
-    <View className="bg-background rounded-2xl p-4 mb-4 flex-row justify-between items-center border border-border/50">
+    <View className="bg-background rounded-2xl p-4 flex-row justify-between items-center border border-border/50">
        <View>
          <Text className="text-foreground font-semibold">Artisan Coffee</Text>
          <Text className="text-accent font-bold text-sm mt-1">Save RM15.00</Text>
        </View>
        <Text className="text-foreground-muted text-sm line-through">RM15.00</Text>
     </View>
-    <TouchableOpacity className="bg-accent w-full py-3.5 rounded-xl items-center shadow-sm">
+    <TouchableOpacity className="bg-accent w-full py-3 rounded-xl items-center shadow-sm">
       <Text className="text-white font-bold text-sm">Save RM15 to Vault Now</Text>
     </TouchableOpacity>
   </View>
 );
 
-const GroupSavings = () => (
-  <View className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
-     <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-foreground font-bold text-lg">Group Savings</Text>
-        <TouchableOpacity>
-          <Text className="text-accent text-sm font-bold">Leaderboard</Text>
-        </TouchableOpacity>
-     </View>
-     <View className="bg-background rounded-2xl p-4 border border-border/50">
-        <View className="flex-row justify-between items-end mb-3">
-           <View>
-             <Text className="text-foreground-muted text-xs font-medium uppercase tracking-wider">Family Fund</Text>
-             <Text className="text-foreground font-bold text-2xl mt-1">RM1,250</Text>
-           </View>
-           <Text className="text-foreground-muted text-xs mb-1 font-medium">Target: RM5,000</Text>
-        </View>
-        <View className="h-2.5 w-full bg-border/40 rounded-full overflow-hidden mb-5">
-          <View className="h-full bg-accent" style={{ width: '25%' }} />
-        </View>
-        <View className="flex-row items-center justify-between">
-           <View className="flex-row">
-              <View className="w-9 h-9 rounded-full bg-accent items-center justify-center border-2 border-background z-20 shadow-sm"><Text className="text-white text-xs font-bold">You</Text></View>
-              <View className="w-9 h-9 rounded-full bg-blue-400 items-center justify-center border-2 border-background -ml-3 z-10 shadow-sm"><Text className="text-white text-xs font-bold">M</Text></View>
-              <View className="w-9 h-9 rounded-full bg-green-400 items-center justify-center border-2 border-background -ml-3 z-0 shadow-sm"><Text className="text-white text-xs font-bold">D</Text></View>
-           </View>
-           <View className="bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-500/20">
-             <Text className="text-yellow-600 font-bold text-xs">Rank: 1st 🏆</Text>
-           </View>
-        </View>
-     </View>
-  </View>
-);
-
 const ExpenseRadar = () => (
-  <View className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
-     <View className="flex-row justify-between items-center mb-4">
+  <View className="bg-background-card border border-border rounded-3xl p-5 shadow-sm h-[200px] flex-col justify-between">
+     <View className="flex-row justify-between items-center">
         <Text className="text-foreground font-bold text-lg">Expense Radar</Text>
         <View className="bg-red-500/10 px-2.5 py-1 rounded-md border border-red-500/20">
            <Text className="text-red-500 text-[10px] uppercase tracking-wider font-bold">Warning</Text>
         </View>
      </View>
-     <View className="bg-red-500/5 rounded-2xl p-4 border border-red-500/20">
+     <View className="bg-red-500/5 rounded-2xl p-4 border border-red-500/20 flex-1 justify-center mt-3">
         <View className="flex-row justify-between items-center mb-3">
            <Text className="text-foreground font-semibold">🍔 Food & Bev</Text>
            <Text className="text-red-500 font-bold text-base">90%</Text>
@@ -110,12 +77,12 @@ const ExpenseRadar = () => (
 );
 
 const GoalTimeline = () => (
-  <View className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm">
-     <View className="flex-row justify-between items-center mb-4">
+  <View className="bg-background-card border border-border rounded-3xl p-5 shadow-sm h-[200px] flex-col justify-between">
+     <View className="flex-row justify-between items-center">
         <Text className="text-foreground font-bold text-lg">Goal Timeline</Text>
         <Text className="text-foreground-muted text-xs">Based on current rate</Text>
      </View>
-     <View className="flex-row items-center bg-background p-3 rounded-2xl border border-border/50">
+     <View className="flex-row items-center bg-background p-3 rounded-2xl border border-border/50 mt-2 mb-2">
         <View className="w-14 h-14 bg-accent/10 rounded-xl items-center justify-center mr-4">
            <Text className="text-2xl">🇯🇵</Text>
         </View>
@@ -127,20 +94,20 @@ const GoalTimeline = () => (
            </View>
         </View>
      </View>
-     <View className="mt-4 pt-4 border-t border-border flex-row justify-between items-center">
+     <View className="pt-3 border-t border-border flex-row justify-between items-center">
        <Text className="text-foreground-muted text-xs font-medium">Estimated complete:</Text>
        <Text className="text-foreground font-bold text-xs">July 15, 2026</Text>
      </View>
   </View>
 );
 
+// Removed GroupSavings from ALL_WIDGETS so it doesn't show up in the customizer
 const ALL_WIDGETS = [
   { id: "SavingStreak", title: "Saving Streak", desc: "Track consecutive saving days." },
   { id: "YieldMaximizer", title: "Yield Maximizer", desc: "Current interest & milestones." },
   { id: "AIInsights", title: "AI Spending Insights", desc: "AI spending analysis." },
   { id: "MentalAccounts", title: "Mental Accounts", desc: "Goal-based category tracking." },
   { id: "MicroSavings", title: "Micro Savings", desc: "1-tap small daily savings." },
-  { id: "GroupSavings", title: "Group Savings", desc: "Save & compete with friends." },
   { id: "ExpenseRadar", title: "Expense Radar", desc: "Budget limit warnings." },
   { id: "GoalTimeline", title: "Goal Timeline", desc: "Predict when you hit your goals." },
 ];
@@ -149,12 +116,16 @@ export default function FinManageScreen() {
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   
-  // V1 State
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [userPersona, setUserPersona] = useState<PersonaType | null>(appState.userPersona);
   const [isEditing, setIsEditing] = useState(false);
-  const [activeLayout, setActiveLayout] = useState<string[]>(userPersona ? personaConfigs[userPersona].defaultLayout : []);
+  
+  // Initialize layout, explicitly filtering out GroupSavings just in case it is in mock-data
+  const [activeLayout, setActiveLayout] = useState<string[]>(
+    userPersona ? personaConfigs[userPersona].defaultLayout.filter(id => id !== "GroupSavings") : []
+  );
+  
   const [showResultModal, setShowResultModal] = useState(false);
   const [mentalAccounts, setMentalAccounts] = useState<MentalAccount[]>([]);
 
@@ -233,7 +204,8 @@ export default function FinManageScreen() {
       appState.hasFinishedQuiz = true;
 
       setUserPersona(topPersona);
-      setActiveLayout(personaConfigs[topPersona].defaultLayout);
+      // Filter out GroupSavings so it doesn't duplicate when persona is chosen
+      setActiveLayout(personaConfigs[topPersona].defaultLayout.filter(id => id !== "GroupSavings"));
       
       if (personaConfigs[topPersona].defaultAccounts) {
         setMentalAccounts(personaConfigs[topPersona].defaultAccounts);
@@ -356,7 +328,7 @@ export default function FinManageScreen() {
                 </TouchableOpacity>
               );
             })}
-            <TouchableOpacity className="mt-4 py-4 items-center border border-border rounded-xl bg-background-cardLight" onPress={() => setActiveLayout(config.defaultLayout)}>
+            <TouchableOpacity className="mt-4 py-4 items-center border border-border rounded-xl bg-background-cardLight" onPress={() => setActiveLayout(config.defaultLayout.filter(id => id !== "GroupSavings"))}>
               <Text className="text-foreground-muted font-bold text-sm">Reset to Persona Default</Text>
             </TouchableOpacity>
           </View>
@@ -365,23 +337,25 @@ export default function FinManageScreen() {
     );
   }
 
-  // 3. Dynamic Dictionary
   const widgetDictionary: Record<string, React.ReactNode> = {
-    SavingStreak: <View className="mb-4" key="streak"><SavingStreak streak={currentStreak} /></View>,
-    YieldMaximizer: <View className="mb-4" key="yield"><YieldMaximizer currentSavings={savingStats.currentSavings} currentRate={isPlanActive ? 4.0 : 3.5} /></View>,
-    AIInsights: <View className="mb-4" key="ai"><AIInsights /></View>,
+    SavingStreak: <View className="mb-6 -mx-4" key="streak"><SavingStreak streak={currentStreak} /></View>,
+    YieldMaximizer: <View className="mb-6 -mx-4" key="yield"><YieldMaximizer currentSavings={savingStats.currentSavings} currentRate={isPlanActive ? 4.0 : 3.5} /></View>,
+    AIInsights: <View className="mb-6 -mx-4" key="ai"><AIInsights /></View>,
+    
+    // 🔥 Restored to standard view without the negative margins or forced heights!
     MentalAccounts: (
-      <MentalAccounts 
-        key="mental"
-        accounts={mentalAccounts}
-        onAddAccount={handleAddAccount}
-        onDeleteAccount={handleDeleteAccount}
-      />
+      <View className="mb-6" key="mental">
+        <MentalAccounts 
+          accounts={mentalAccounts}
+          onAddAccount={handleAddAccount}
+          onDeleteAccount={handleDeleteAccount}
+        />
+      </View>
     ),
-    MicroSavings: <MicroSavings key="micro" />,
-    GroupSavings: <GroupSavings key="group" />,
-    ExpenseRadar: <ExpenseRadar key="radar" />,
-    GoalTimeline: <GoalTimeline key="timeline" />,
+    
+    MicroSavings: <View className="mb-6" key="micro"><MicroSavings /></View>,
+    ExpenseRadar: <View className="mb-6" key="radar"><ExpenseRadar /></View>,
+    GoalTimeline: <View className="mb-6" key="timeline"><GoalTimeline /></View>,
   };
 
   // 4. Main Dashboard
@@ -423,7 +397,7 @@ export default function FinManageScreen() {
         <TouchableOpacity 
           onPress={handleNavigateToPetHub}
           activeOpacity={0.9}
-          className="mx-4 mb-4 shadow-xl shadow-black/40 relative overflow-hidden rounded-3xl"
+          className="mx-4 mb-6 shadow-xl shadow-black/40 relative overflow-hidden rounded-3xl"
         >
           <DigitalTank height={180} koiColor={config.fishColor} /> 
           <View className="absolute bottom-2 left-2 bg-background/80 rounded-lg px-3 py-1 border border-accent/10">
@@ -432,17 +406,20 @@ export default function FinManageScreen() {
         </TouchableOpacity>
 
         {isPlanActive && (
-          <View className="px-4 mb-4">
-          <ManageSavingPlan onUpdate={handleRefresh} />             
-          <View className="mt-4">
-               <GroupSavingCard />
-             </View>
+          <View className="px-4 mb-6">
+             <ManageSavingPlan onUpdate={handleRefresh} />             
           </View>
         )}
 
+        {/* 🔥 Group Saving Card is Hardcoded to ALWAYS appear first before customized widgets */}
+        <View className="px-4 mb-6">
+           <GroupSavingCard />
+        </View>
+
+        {/* Dynamic Customized Widgets */}
         <View className="px-4">
           {activeLayout.map(widgetName => widgetDictionary[widgetName] || (
-             <View key={widgetName} className="mb-4 bg-background-card border border-border rounded-3xl p-5 shadow-sm justify-center items-center h-24">
+             <View key={widgetName} className="mb-6 bg-background-card border border-border rounded-3xl p-5 shadow-sm justify-center items-center h-[200px]">
                <Text className="text-foreground-muted font-medium">{ALL_WIDGETS.find(w => w.id === widgetName)?.title || widgetName}</Text>
                <Text className="text-foreground-muted text-xs mt-1">Component Coming Soon</Text>
              </View>
@@ -450,13 +427,13 @@ export default function FinManageScreen() {
         </View>
 
         {activeLayout.length < 4 && (
-          <TouchableOpacity onPress={() => setIsEditing(true)} className="mx-4 mt-2 mb-4 p-5 border border-dashed border-accent/40 rounded-2xl items-center bg-accent/5">
+          <TouchableOpacity onPress={() => setIsEditing(true)} className="mx-4 mt-2 mb-6 p-5 border border-dashed border-accent/40 rounded-2xl items-center bg-accent/5">
             <Text className="text-accent font-bold">+ Add widget ({activeLayout.length}/4)</Text>
           </TouchableOpacity>
         )}
 
         {!isPlanActive && (
-          <View className="mx-4 mt-2 mb-4">
+          <View className="mx-4 mt-2 mb-6">
             <NudgeBanner onPress={() => router.push("/saving-plan")} />
           </View>
         )}
