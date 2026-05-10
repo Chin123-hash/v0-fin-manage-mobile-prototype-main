@@ -426,6 +426,7 @@ export const appState = {
   groups: [] as GroupInstance[], 
   groupPocketBalance: 0.0,
   targetAmount: 10000.0,
+  hasUnclaimedReward: true,
   activePlan: {
     microSavingAmount: 10,
     autoSaveAmount: 10,

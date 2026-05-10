@@ -394,35 +394,41 @@ export default function FinManageScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={handleNavigateToPetHub}
           activeOpacity={0.9}
           className="mx-4 mb-6 shadow-xl shadow-black/40 relative overflow-hidden rounded-3xl"
         >
-          <DigitalTank height={180} koiColor={config.fishColor} /> 
+          <DigitalTank height={180} koiColor={config.fishColor} />
           <View className="absolute bottom-2 left-2 bg-background/80 rounded-lg px-3 py-1 border border-accent/10">
             <Text className="text-accent text-xs font-bold">Kira the Koi • LVL 5</Text>
           </View>
         </TouchableOpacity>
 
-        {isPlanActive && (
-          <View className="px-4 mb-6">
-             <ManageSavingPlan onUpdate={handleRefresh} />             
+        {/* 🔥 Conditional Top Area: Nudge Banner vs Active Plans */}
+        {!isPlanActive ? (
+          <View className="mx-4 mb-6">
+            <NudgeBanner onPress={() => router.push("/saving-plan")} />
           </View>
-        )}
+        ) : (
+          <>
+            <View className="px-4 mb-6">
+              <ManageSavingPlan onUpdate={handleRefresh} />
+            </View>
 
-        {/* 🔥 Group Saving Card is Hardcoded to ALWAYS appear first before customized widgets */}
-        <View className="px-4 mb-6">
-           <GroupSavingCard />
-        </View>
+            <View className="px-4 mb-6">
+              <GroupSavingCard />
+            </View>
+          </>
+        )}
 
         {/* Dynamic Customized Widgets */}
         <View className="px-4">
           {activeLayout.map(widgetName => widgetDictionary[widgetName] || (
-             <View key={widgetName} className="mb-6 bg-background-card border border-border rounded-3xl p-5 shadow-sm justify-center items-center h-[200px]">
-               <Text className="text-foreground-muted font-medium">{ALL_WIDGETS.find(w => w.id === widgetName)?.title || widgetName}</Text>
-               <Text className="text-foreground-muted text-xs mt-1">Component Coming Soon</Text>
-             </View>
+            <View key={widgetName} className="mb-6 bg-background-card border border-border rounded-3xl p-5 shadow-sm justify-center items-center h-[200px]">
+              <Text className="text-foreground-muted font-medium">{ALL_WIDGETS.find(w => w.id === widgetName)?.title || widgetName}</Text>
+              <Text className="text-foreground-muted text-xs mt-1">Component Coming Soon</Text>
+            </View>
           ))}
         </View>
 
@@ -430,12 +436,6 @@ export default function FinManageScreen() {
           <TouchableOpacity onPress={() => setIsEditing(true)} className="mx-4 mt-2 mb-6 p-5 border border-dashed border-accent/40 rounded-2xl items-center bg-accent/5">
             <Text className="text-accent font-bold">+ Add widget ({activeLayout.length}/4)</Text>
           </TouchableOpacity>
-        )}
-
-        {!isPlanActive && (
-          <View className="mx-4 mt-2 mb-6">
-            <NudgeBanner onPress={() => router.push("/saving-plan")} />
-          </View>
         )}
       </ScrollView>
     </SafeAreaView>
