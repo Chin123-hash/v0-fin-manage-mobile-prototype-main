@@ -7,7 +7,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v
 First, run the development server:
 
 ```bash
-npx expo start
+npx expo start -c
 ```
 and scan with expo go apps
 
