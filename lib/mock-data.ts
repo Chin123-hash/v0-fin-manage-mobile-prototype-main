@@ -257,7 +257,7 @@ export const personaConfigs: Record<PersonaType, { name: string; fishColor: stri
   visionary: { 
     name: "The Visionary", 
     fishColor: "galaxy", 
-    defaultLayout: ["MentalAccounts", "GoalTimeline", "AIInsights", "MicroSavings"],
+    defaultLayout: ["MentalAccounts", "GoalTimeline", "AIInsights", "YieldMaximizer"],
     analysis: "You save with a purpose. Your big dreams drive your financial discipline, turning every goal into a reachable destination.",
     defaultAccounts: [
       { id: "1", name: "Daily Account", balance: 350.0, target: 1000, theme: "neutral", icon: "wallet", description: "Everyday spending" },
@@ -279,7 +279,7 @@ export const personaConfigs: Record<PersonaType, { name: string; fishColor: stri
   micro: { 
     name: "The Micro-Saver", 
     fishColor: "calico", 
-    defaultLayout: ["MicroSavings", "SavingStreak", "MentalAccounts", "AIInsights"],
+    defaultLayout: ["SavingStreak", "MentalAccounts", "YieldMaximizer", "AIInsights"],
     analysis: "You understand that small drops make an ocean. Your strength lies in consistency and making saving an effortless daily habit.",
     defaultAccounts: [
       { id: "1", name: "Daily Account", balance: 250.0, target: 800, theme: "neutral", icon: "wallet", description: "Everyday spending" },
@@ -290,7 +290,7 @@ export const personaConfigs: Record<PersonaType, { name: string; fishColor: stri
   impulse: { 
     name: "The Impulse Spender", 
     fishColor: "fire", 
-    defaultLayout: ["AIInsights", "ExpenseRadar", "MicroSavings", "SavingStreak"],
+    defaultLayout: ["AIInsights", "ExpenseRadar", "YieldMaximizer", "SavingStreak"],
     analysis: "You live for the moment! We're here to help you balance your spontaneous joy with the security of a healthy savings habit.",
     defaultAccounts: [
       { id: "1", name: "Daily Account", balance: 150.0, target: 1000, theme: "neutral", icon: "wallet", description: "Everyday spending" },

@@ -28,29 +28,29 @@ import {
 // ✨ Decorated Dashboard Widgets
 // ==========================================
 
-const MicroSavings = () => (
-  <View className="bg-background-card border border-border rounded-3xl p-5 shadow-sm h-[200px] flex-col justify-between">
-    <View className="flex-row justify-between items-center">
-      <View>
-        <Text className="text-foreground font-bold text-lg">Micro Savings</Text>
-        <Text className="text-foreground-muted text-xs mt-1">Skip a treat, boost your wealth</Text>
-      </View>
-      <View className="bg-accent/10 p-3 rounded-full">
-        <Text className="text-accent text-xl">☕</Text>
-      </View>
-    </View>
-    <View className="bg-background rounded-2xl p-4 flex-row justify-between items-center border border-border/50">
-       <View>
-         <Text className="text-foreground font-semibold">Artisan Coffee</Text>
-         <Text className="text-accent font-bold text-sm mt-1">Save RM15.00</Text>
-       </View>
-       <Text className="text-foreground-muted text-sm line-through">RM15.00</Text>
-    </View>
-    <TouchableOpacity className="bg-accent w-full py-3 rounded-xl items-center shadow-sm">
-      <Text className="text-white font-bold text-sm">Save RM15 to Vault Now</Text>
-    </TouchableOpacity>
-  </View>
-);
+// const MicroSavings = () => (
+//   <View className="bg-background-card border border-border rounded-3xl p-5 shadow-sm h-[200px] flex-col justify-between">
+//     <View className="flex-row justify-between items-center">
+//       <View>
+//         <Text className="text-foreground font-bold text-lg">Micro Savings</Text>
+//         <Text className="text-foreground-muted text-xs mt-1">Skip a treat, boost your wealth</Text>
+//       </View>
+//       <View className="bg-accent/10 p-3 rounded-full">
+//         <Text className="text-accent text-xl">☕</Text>
+//       </View>
+//     </View>
+//     <View className="bg-background rounded-2xl p-4 flex-row justify-between items-center border border-border/50">
+//        <View>
+//          <Text className="text-foreground font-semibold">Artisan Coffee</Text>
+//          <Text className="text-accent font-bold text-sm mt-1">Save RM15.00</Text>
+//        </View>
+//        <Text className="text-foreground-muted text-sm line-through">RM15.00</Text>
+//     </View>
+//     <TouchableOpacity className="bg-accent w-full py-3 rounded-xl items-center shadow-sm">
+//       <Text className="text-white font-bold text-sm">Save RM15 to Vault Now</Text>
+//     </TouchableOpacity>
+//   </View>
+// );
 
 const ExpenseRadar = () => (
   <View className="bg-background-card border border-border rounded-3xl p-5 shadow-sm h-[200px] flex-col justify-between">
@@ -107,7 +107,7 @@ const ALL_WIDGETS = [
   { id: "YieldMaximizer", title: "Yield Maximizer", desc: "Current interest & milestones." },
   { id: "AIInsights", title: "AI Spending Insights", desc: "AI spending analysis." },
   { id: "MentalAccounts", title: "Mental Accounts", desc: "Goal-based category tracking." },
-  { id: "MicroSavings", title: "Micro Savings", desc: "1-tap small daily savings." },
+  // { id: "MicroSavings", title: "Micro Savings", desc: "1-tap small daily savings." },
   { id: "ExpenseRadar", title: "Expense Radar", desc: "Budget limit warnings." },
   { id: "GoalTimeline", title: "Goal Timeline", desc: "Predict when you hit your goals." },
 ];
@@ -355,7 +355,7 @@ export default function FinManageScreen() {
       </View>
     ),
     
-    MicroSavings: <View className="mb-6" key="micro"><MicroSavings /></View>,
+    // MicroSavings: <View className="mb-6" key="micro"><MicroSavings /></View>,
     ExpenseRadar: <View className="mb-6" key="radar"><ExpenseRadar /></View>,
     GoalTimeline: <View className="mb-6" key="timeline"><GoalTimeline /></View>,
   };
