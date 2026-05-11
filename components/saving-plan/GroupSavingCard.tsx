@@ -1,19 +1,38 @@
-// components/saving-plan/GroupSavingCard.tsx
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, TouchableOpacity, Modal } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Users, TrendingUp, Sparkles, UserPlus, Plus, PlusCircle, ShieldCheck } from "lucide-react-native";
+import { 
+  Users, 
+  TrendingUp, 
+  Sparkles, 
+  UserPlus, 
+  Plus, 
+  PlusCircle, 
+  ShieldCheck, 
+  ChevronDown, 
+  ChevronUp 
+} from "lucide-react-native";
 import { appState } from "@/lib/mock-data";
 import { colors } from "@/lib/constants";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
 export function GroupSavingCard() {
   const router = useRouter();
+  
+  // 🔥 Sync local state with global appState
   const [localGroups, setLocalGroups] = useState(appState.groups);
   const [topUpModalVisible, setTopUpModalVisible] = useState(false);
   const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
+  const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
 
   const isJoined = localGroups.length > 0;
+
+  // 🔥 This hook refreshes the list whenever you navigate back to this screen
+  useFocusEffect(
+    useCallback(() => {
+      setLocalGroups([...appState.groups]);
+    }, [])
+  );
 
   const handleGroupPress = (id: string, name: string) => {
     router.push({
@@ -34,10 +53,14 @@ export function GroupSavingCard() {
       return group;
     });
 
-    // Update local UI and global mock state
+    // Update both local UI and global mock state
     setLocalGroups(updatedGroups);
     appState.groups = updatedGroups;
     setTopUpModalVisible(false);
+  };
+
+  const toggleDropdown = (groupId: string) => {
+    setExpandedGroupId(expandedGroupId === groupId ? null : groupId);
   };
 
   const openTopUpModal = (groupId: string) => {
@@ -60,7 +83,6 @@ export function GroupSavingCard() {
           </View>
         </View>
 
-        {/* The + Button: Only show if user has 1 group (Max 2) */}
         {localGroups.length === 1 && (
           <TouchableOpacity
             onPress={handleJoinAction}
@@ -93,62 +115,116 @@ export function GroupSavingCard() {
           </View>
         ) : (
           <View className="gap-4">
-            {localGroups.map((group, index) => (
-              <View
-                key={group.id}
-                className={index > 0 ? "pt-5 border-t border-white/5" : ""}
-              >
-                <View className="flex-row justify-between mb-4">
-                  <View>
-                    <Text className="text-foreground-secondary text-[10px] uppercase font-bold tracking-widest mb-1">{group.name}</Text>
-                    <Text className="text-foreground text-3xl font-bold">RM {group.balance.toLocaleString()}</Text>
+            {localGroups.map((group, index) => {
+              const groupStreak = group.members && group.members.length > 0 
+                ? Math.min(...group.members.map(m => m.streak || 0)) 
+                : 0;
+              const isExpanded = expandedGroupId === group.id;
+
+              return (
+                <View
+                  key={group.id}
+                  className={index > 0 ? "pt-5 border-t border-white/5" : ""}
+                >
+                  <View className="flex-row justify-between mb-4">
+                    <View>
+                      <Text className="text-foreground-secondary text-[10px] uppercase font-bold tracking-widest mb-1">{group.name}</Text>
+                      <Text className="text-foreground text-3xl font-bold">RM {group.balance.toLocaleString()}</Text>
+                    </View>
+                    <View className="bg-accent/20 rounded-full px-3 py-1 flex-row items-center self-start border border-accent/30">
+                      <TrendingUp size={14} color={colors.accent.teal} />
+                      <Text className="text-accent font-bold text-xs ml-1">+0.5% p.a.</Text>
+                    </View>
                   </View>
-                  <View className="bg-accent/20 rounded-full px-3 py-1 flex-row items-center self-start border border-accent/30">
-                    <TrendingUp size={14} color={colors.accent.teal} />
-                    <Text className="text-accent font-bold text-xs ml-1">+0.5% p.a.</Text>
+
+                  {/* Group Streak Progress Bar & Dropdown */}
+                  <View className="mb-5 bg-background p-3 rounded-2xl border border-border/50">
+                    <TouchableOpacity 
+                      onPress={() => toggleDropdown(group.id)}
+                      activeOpacity={0.7}
+                      className="flex-row justify-between items-center mb-2"
+                    >
+                      <Text className="text-foreground font-semibold text-sm">Squad Streak: {groupStreak} Days</Text>
+                      <View className="flex-row items-center">
+                        <Text className="text-accent font-bold text-xs mr-2">10 Days to Reward</Text>
+                        {isExpanded ? (
+                           <ChevronUp size={16} color={colors.text.muted} />
+                        ) : (
+                           <ChevronDown size={16} color={colors.text.muted} />
+                        )}
+                      </View>
+                    </TouchableOpacity>
+
+                    <View className="h-2 w-full bg-background-cardLight rounded-full overflow-hidden mb-2">
+                      <View className="h-full bg-accent rounded-full" style={{ width: `${Math.min((groupStreak / 10) * 100, 100)}%` }} />
+                    </View>
+
+                    {/* Expandable Teammate Breakdown */}
+                    {isExpanded && (
+                      <View className="pt-3 pb-1 border-t border-border/30 mt-3">
+                        {group.members?.map(member => {
+                          const streak = member.streak || 0;
+                          const maxStreakForScale = Math.max(15, ...(group.members.map(m => m.streak || 0)));
+                          const widthPercent = Math.min((streak / maxStreakForScale) * 100, 100);
+                          
+                          // 🔥 Fixed typing for barColor
+                          let barColor: string = colors.accent.pink; 
+                          if (streak >= 10) barColor = "#f59e0b"; // Orange/Amber
+                          else if (streak >= 5) barColor = colors.accent.teal; // Teal
+
+                          return (
+                            <View key={member.id} className="mb-3">
+                              <View className="flex-row justify-between items-center mb-1.5">
+                                <View className="flex-row items-center">
+                                  <View className="w-5 h-5 rounded-full items-center justify-center mr-2 border border-white/10" style={{ backgroundColor: member.color + '30' }}>
+                                    <Text style={{ color: member.color, fontSize: 9, fontWeight: 'bold' }}>{member.initials}</Text>
+                                  </View>
+                                  <Text className="text-foreground-muted text-xs">{member.name}</Text>
+                                </View>
+                                <Text className="text-xs font-bold" style={{ color: barColor }}>
+                                  {streak} Days
+                                </Text>
+                              </View>
+                              <View className="h-1.5 w-full bg-background-cardLight rounded-full overflow-hidden">
+                                <View className="h-full rounded-full" style={{ width: `${widthPercent}%`, backgroundColor: barColor }} />
+                              </View>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    )}
+
+                    <Text className="text-foreground-muted text-[10px] leading-4 italic mt-1">
+                      Keep on working up on personal saving to continue the group streak!
+                    </Text>
+                  </View>
+
+                  <View className="flex-row gap-3">
+                    <TouchableOpacity
+                      onPress={() => handleGroupPress(group.id, group.name)}
+                      activeOpacity={0.7}
+                      className="flex-1 bg-background-cardLight py-2.5 rounded-xl items-center justify-center border border-border"
+                    >
+                      <Text className="text-foreground font-semibold text-sm">Squad Chat</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => openTopUpModal(group.id)}
+                      activeOpacity={0.7}
+                      className="flex-1 bg-accent py-2.5 rounded-xl items-center justify-center flex-row shadow-lg shadow-accent/30"
+                    >
+                      <PlusCircle size={16} color="#ffffff" />
+                      <Text className="text-white font-semibold text-sm ml-1.5">Top Up</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
-
-                {/* 🔥 New Task 3: Group Streak Progress Bar */}
-                <View className="mb-4 bg-background p-3 rounded-2xl border border-border/50">
-                  <View className="flex-row justify-between items-center mb-2">
-                    <Text className="text-foreground font-semibold text-sm">Squad Streak: 1 Day</Text>
-                    <Text className="text-accent font-bold text-xs">9/10 to Reward</Text>
-                  </View>
-                  <View className="h-2 w-full bg-background-cardLight rounded-full overflow-hidden mb-2">
-                    <View className="h-full bg-accent rounded-full" style={{ width: '10%' }} />
-                  </View>
-                  <Text className="text-foreground-muted text-[10px] leading-3 italic">
-                    Keep on working up on personal saving to continue the group streak!
-                  </Text>
-                </View>
-
-                {/* 🔥 The Action Buttons */}
-                <View className="flex-row gap-3">
-                  <TouchableOpacity
-                    onPress={() => handleGroupPress(group.id, group.name)}
-                    activeOpacity={0.7}
-                    className="flex-1 bg-background-cardLight py-2.5 rounded-xl items-center justify-center border border-border"
-                  >
-                    <Text className="text-foreground font-semibold text-sm">Squad Chat</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    onPress={() => openTopUpModal(group.id)}
-                    activeOpacity={0.7}
-                    className="flex-1 bg-accent py-2.5 rounded-xl items-center justify-center flex-row shadow-lg shadow-accent/30"
-                  >
-                    <PlusCircle size={16} color="#ffffff" />
-                    <Text className="text-white font-semibold text-sm ml-1.5">Top Up</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
       </LinearGradient>
 
-      {/* 🔥 The Top Up Modal with GXBank Promotion */}
+      {/* Top Up Modal */}
       <Modal visible={topUpModalVisible} transparent={true} animationType="slide">
         <View className="flex-1 justify-end bg-black/60">
           <View className="bg-background-card rounded-t-[32px] p-6 border-t border-accent/20">
@@ -160,7 +236,6 @@ export function GroupSavingCard() {
               </TouchableOpacity>
             </View>
 
-            {/* GXBank Promo Banner */}
             <View className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-4 mb-6 flex-row items-center">
               <View className="w-10 h-10 bg-purple-500/20 rounded-full items-center justify-center mr-3">
                 <ShieldCheck size={20} color="#a855f7" />

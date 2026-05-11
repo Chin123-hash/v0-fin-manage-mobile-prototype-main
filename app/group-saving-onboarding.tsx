@@ -34,21 +34,43 @@ export default function GroupSavingOnboardingScreen() {
         const finalName = groupName.trim() || (appState.groups.length === 0 ? "Japan Trip Squad" : "Gaming Fund");
 
         const invitedMembers = fakeContacts.filter(c => selectedContacts.includes(c.id));
+        
+        // Import reference data to match streaks and colors
+        const { groupMembers, personaConfigs } = require('@/lib/mock-data');
 
         const newGroup: GroupInstance = {
             id: `group-${appState.groups.length + 1}`,
             name: finalName,
-            balance: 0,
-            members: invitedMembers.map(c => ({
-                id: c.id,
-                name: c.name,
-                initials: c.name[0],
-                color: colors.accent.pink,
-                phone: c.phone // Capture the phone number here
-            })),
+            balance: 1500.0, // 🔥 Set default starting amount
+            members: invitedMembers.map((c) => {
+                // Find matching member in mock-data to preserve their assigned streak
+                const mockFriend = groupMembers.find((m: any) => 
+                    m.name.toLowerCase().includes(c.name.toLowerCase())
+                );
+                
+                return {
+                    id: c.id,
+                    name: c.name,
+                    initials: c.name[0],
+                    color: mockFriend?.color || colors.accent.pink,
+                    streak: mockFriend?.streak || 1, // 🔥 Preserve the streak from mock-data
+                    phone: c.phone
+                };
+            }),
         };
 
-        appState.groups.push(newGroup);
+        // Add yourself to the group correctly
+        const userPersona = appState.userPersona || 'balancer';
+        newGroup.members.unshift({
+            id: 'me',
+            name: 'You',
+            initials: 'Y', 
+            color: personaConfigs[userPersona].fishColor === 'gold' ? '#FFD700' : colors.accent.teal,
+            streak: 15, // Your high streak
+        });
+
+        // 🔥 Replace groups (don't .push) to avoid Raj or "Double Me" ghosts from old data
+        appState.groups = [newGroup]; 
         appState.isGroupSavingActive = true;
         router.replace("/(tabs)/fin-manage");
     };

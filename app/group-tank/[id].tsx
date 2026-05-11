@@ -42,7 +42,8 @@ export default function GroupTankScreen() {
             <DigitalTank isFullScreen={true} hideFish={false} koiColor={myFishColor}>
                 
                 {/* 🐟 Generate Teammate Fishes */}
-                {group?.members?.map((member, index) => {
+                {/* 🔥 FIX: Filter out 'me' so your fish isn't duplicated in the teammates map */}
+                {group?.members?.filter(m => m.id !== "me").map((member, index) => {
                     const pos = positions[index % positions.length];
                     const color = fishColors[index % fishColors.length];
                     
@@ -58,13 +59,12 @@ export default function GroupTankScreen() {
                                 zIndex: 10
                             }}
                         >
-                            {/* 🔥 Explicitly set teammates to Level 5 so they don't get the crown */}
                             <KoiFish size={pos.size} color={color as any} level={5} />
                             
                             {/* Teammate Name Tag */}
                             <View 
                                 className="bg-black/50 px-2 py-1 rounded-full mt-2" 
-                                style={{ transform: [{ scaleX: pos.scaleX }] }} // reverse the mirror effect on the text
+                                style={{ transform: [{ scaleX: pos.scaleX }] }}
                             >
                                 <Text className="text-white text-[9px] font-bold uppercase tracking-wider">{member.name}</Text>
                             </View>

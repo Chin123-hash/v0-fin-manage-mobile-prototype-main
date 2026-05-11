@@ -10,13 +10,6 @@ export interface MentalAccount {
   description?: string;
 }
 
-export interface GroupMember {
-  id: string;
-  name: string;
-  initials: string;
-  color: string;
-}
-
 export interface SavingStats {
   streak: number;
   currentSavings: number;
@@ -90,10 +83,10 @@ export const mentalAccounts: MentalAccount[] = [
 
 // Group Saving Members
 export const groupMembers: GroupMember[] = [
-  { id: "aisyah", name: "Aisyah", initials: "A", color: "#ff006e" },
-  { id: "yusuf", name: "Yusuf", initials: "Y", color: "#00f5d4" },
-  { id: "mei", name: "Mei Ling", initials: "M", color: "#ffd166" },
-  { id: "raj", name: "Raj", initials: "R", color: "#9d4edd" },
+  { id: "aisyah", name: "Aisyah", initials: "A", color: "#ff006e", streak: 8 },
+  { id: "yusuf", name: "Yusuf", initials: "Y", color: "#00f5d4", streak: 15 },
+  { id: "mei", name: "Mei Ling", initials: "M", color: "#ffd166", streak: 1 },
+  { id: "raj", name: "Raj", initials: "R", color: "#9d4edd", streak: 5 },
 ];
 
 // User Saving Stats
@@ -406,15 +399,17 @@ export interface GroupInstance {
   members: GroupMember[];
 }
 
+// Add streak?: number to the GroupMember interface
 export interface GroupMember {
   id: string;
   name: string;
   initials: string;
   color: string;
   phone?: string; 
+  streak?: number; // 🔥 NEW: Track individual member streak
 }
 
-// 🔥 Merged global-ish state for the prototype
+// Update appState to include a pre-populated group with varied streaks
 export const appState = {
   // From V1 (Quiz & Persona state)
   userPersona: null as PersonaType | null,
@@ -422,8 +417,11 @@ export const appState = {
   
   // From V2 (Saving Plan & Group state)
   isPersonalPlanActive: false,
+  
+  // 🔥 Reverted to false and empty array!
   isGroupSavingActive: false, 
   groups: [] as GroupInstance[], 
+
   groupPocketBalance: 0.0,
   targetAmount: 10000.0,
   hasUnclaimedReward: true,
@@ -433,7 +431,7 @@ export const appState = {
     autoSaveTrigger: 100,
   },
   
-  // 🔥 New for Task 1: Leveling & Rewards State
+  // Pet Stats & Rewards
   petStats: {
     name: "Kira",
     type: "Koi Fish",

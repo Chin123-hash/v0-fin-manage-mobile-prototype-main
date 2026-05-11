@@ -10,17 +10,9 @@ import { appState } from "@/lib/mock-data";
 export default function GroupDetailsScreen() {
     const router = useRouter();
     const { id } = useLocalSearchParams<{ id: string }>();
-
-    // Find the specific group from global state
     const group = appState.groups.find(g => g.id === id);
 
-    if (!group) {
-        return (
-            <View className="flex-1 bg-background items-center justify-center">
-                <Text className="text-white">Group not found</Text>
-            </View>
-        );
-    }
+    if (!group) return null;
 
     return (
         <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
@@ -32,7 +24,6 @@ export default function GroupDetailsScreen() {
             </View>
 
             <ScrollView className="flex-1 p-4">
-                {/* Group Name Section */}
                 <View className="bg-background-card rounded-2xl p-4 mb-6">
                     <View className="flex-row justify-between items-center mb-2">
                         <Text className="text-foreground-muted text-xs uppercase font-bold">Group Name</Text>
@@ -45,35 +36,24 @@ export default function GroupDetailsScreen() {
                 <View className="flex-row items-center mb-4">
                     <Users size={20} color={colors.accent.pink} />
                     <Text className="text-foreground font-bold text-lg ml-2">
-                        Members ({group.members.length + 1})
+                        {/* 🔥 FIX: Count directly from members array */}
+                        Members ({group.members.length})
                     </Text>
                 </View>
 
                 {/* Members List */}
                 <View className="bg-background-card rounded-2xl overflow-hidden mb-6">
-                    {/* Always include "Me" as the creator */}
-                    <View className="flex-row items-center p-4 border-b border-white/5">
-                        <View className="w-10 h-10 rounded-full bg-accent/20 items-center justify-center mr-3">
-                            <Text className="text-accent font-bold">ME</Text>
-                        </View>
-                        <View>
-                            <Text className="text-foreground font-semibold">You (Leader)</Text>
-                            <Text className="text-foreground-muted text-xs">012-***-5678</Text>
-                        </View>
-                    </View>
-
-                    {/* List the fetched invited members */}
+                    {/* 🔥 FIX: Combined list that dynamically styles 'Me' */}
                     {group.members.map((member) => (
                         <View key={member.id} className="flex-row items-center p-4 border-b border-white/5">
-                            <View className="w-10 h-10 rounded-full bg-background-secondary items-center justify-center mr-3">
-                                <Text className="text-foreground font-bold">{member.name[0]}</Text>
+                            <View className={`w-10 h-10 rounded-full items-center justify-center mr-3 ${member.id === 'me' ? 'bg-accent/20' : 'bg-background-secondary'}`}>
+                                <Text className={`font-bold ${member.id === 'me' ? 'text-accent' : 'text-foreground'}`}>{member.id === 'me' ? 'ME' : member.name[0]}</Text>
                             </View>
                             <View className="flex-1">
-                                <Text className="text-foreground font-semibold">{member.name}</Text>
+                                <Text className="text-foreground font-semibold">{member.name}{member.id === 'me' ? ' (Leader)' : ''}</Text>
                                 <View className="flex-row items-center">
                                     <Phone size={10} color={colors.text.muted} />
-                                    {/* FIX: Display actual phone instead of initials */}
-                                    <Text className="text-foreground-muted text-xs ml-1">{member.phone}</Text>
+                                    <Text className="text-foreground-muted text-xs ml-1">{member.phone || '01*-***-****'}</Text>
                                 </View>
                             </View>
                             <View className="bg-accent/10 px-2 py-0.5 rounded-md">
