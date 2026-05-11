@@ -1,121 +1,277 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useState, useCallback } from "react";
+import { View, Text, TouchableOpacity, Modal } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Users, Plus, TrendingUp } from "lucide-react-native";
-import { groupMembers } from "@/lib/mock-data";
+import { 
+  Users, 
+  TrendingUp, 
+  Sparkles, 
+  UserPlus, 
+  Plus, 
+  PlusCircle, 
+  ShieldCheck, 
+  ChevronDown, 
+  ChevronUp 
+} from "lucide-react-native";
+import { appState } from "@/lib/mock-data";
 import { colors } from "@/lib/constants";
+import { useRouter, useFocusEffect } from "expo-router";
 
-interface GroupSavingCardProps {
-  onJoin?: () => void;
-}
+export function GroupSavingCard() {
+  const router = useRouter();
+  
+  // 🔥 Sync local state with global appState
+  const [localGroups, setLocalGroups] = useState(appState.groups);
+  const [topUpModalVisible, setTopUpModalVisible] = useState(false);
+  const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
+  const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
 
-export function GroupSavingCard({ onJoin }: GroupSavingCardProps) {
+  const isJoined = localGroups.length > 0;
+
+  // 🔥 This hook refreshes the list whenever you navigate back to this screen
+  useFocusEffect(
+    useCallback(() => {
+      setLocalGroups([...appState.groups]);
+    }, [])
+  );
+
+  const handleGroupPress = (id: string, name: string) => {
+    router.push({
+      pathname: "/group-chat/[id]", 
+      params: { id, name }
+    });
+  };
+
+  const handleJoinAction = () => {
+    router.push("/group-saving-onboarding");
+  };
+
+  const handleTopUpConfirm = (amount: number) => {
+    const updatedGroups = localGroups.map(group => {
+      if (group.id === activeGroupId) {
+        return { ...group, balance: group.balance + amount };
+      }
+      return group;
+    });
+
+    // Update both local UI and global mock state
+    setLocalGroups(updatedGroups);
+    appState.groups = updatedGroups;
+    setTopUpModalVisible(false);
+  };
+
+  const toggleDropdown = (groupId: string) => {
+    setExpandedGroupId(expandedGroupId === groupId ? null : groupId);
+  };
+
+  const openTopUpModal = (groupId: string) => {
+    setActiveGroupId(groupId);
+    setTopUpModalVisible(true);
+  };
+
   return (
     <View className="mb-6">
-      <View className="flex-row items-center mb-4">
-        {/* FIXED: Changed bg-pink/20 to bg-accent-pink/20 */}
-        <View className="w-10 h-10 rounded-full bg-[#ff006e]/20 items-center justify-center mr-3">
-          <Users size={20} color={colors.accent.pink} />
+      <View className="flex-row items-center justify-between mb-4">
+        <View className="flex-row items-center">
+          <View className="w-10 h-10 rounded-full bg-[#ff006e]/20 items-center justify-center mr-3">
+            <Users size={20} color={colors.accent.pink} />
+          </View>
+          <View>
+            <Text className="text-foreground font-semibold text-base">Group Saving Challenge</Text>
+            <Text className="text-foreground-muted text-sm">
+              {isJoined ? `${localGroups.length} Active Squads` : "Save together, earn more"}
+            </Text>
+          </View>
         </View>
-        <View>
-          <Text className="text-foreground font-semibold text-base">
-            Group Saving Challenge
-          </Text>
-          <Text className="text-foreground-muted text-sm">
-            Save together with friends
-          </Text>
-        </View>
+
+        {localGroups.length === 1 && (
+          <TouchableOpacity
+            onPress={handleJoinAction}
+            className="w-10 h-10 rounded-full bg-accent/10 border border-accent/30 items-center justify-center"
+          >
+            <Plus size={20} color={colors.accent.teal} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <LinearGradient
         colors={[colors.background.card, colors.background.secondary]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{
-          borderRadius: 16,
-          padding: 16,
-        }}
+        style={{ borderRadius: 16, padding: 16 }}
       >
-        {/* Bonus badge */}
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-foreground font-semibold">Japan Trip Squad</Text>
-          <View className="flex-row items-center bg-[#00f5d4]/20 rounded-full px-3 py-1">
-            <TrendingUp size={14} color={colors.accent.teal} />
-            <Text className="text-accent font-bold text-sm ml-1">
-              +0.5% p.a. bonus
+        {!isJoined ? (
+          <View>
+            <View className="flex-row items-center mb-3">
+              <Sparkles size={16} color={colors.accent.gold} />
+              <Text className="text-foreground font-bold ml-2">Exclusive Group Perks</Text>
+            </View>
+            <Text className="text-foreground-muted text-sm mb-4 leading-5">
+              Join a squad to earn <Text className="text-accent font-bold">+0.5% p.a. bonus interest</Text> and unlock the <Text className="text-accent-pink font-bold">Gold Fin</Text>!
             </Text>
-          </View>
-        </View>
-
-        {/* Group members */}
-        <View className="flex-row items-center mb-4">
-          {/* Avatar stack */}
-          <View className="flex-row">
-            {groupMembers.map((member, index) => (
-              <View
-                key={member.id}
-                className="w-10 h-10 rounded-full items-center justify-center border-2 border-background-card"
-                style={{
-                  backgroundColor: member.color,
-                  marginLeft: index > 0 ? -12 : 0,
-                  zIndex: groupMembers.length - index,
-                }}
-              >
-                <Text className="text-white font-bold text-sm">
-                  {member.initials}
-                </Text>
-              </View>
-            ))}
-            {/* Add member button */}
-            <TouchableOpacity
-              className="w-10 h-10 rounded-full items-center justify-center border-2 border-dashed border-foreground-muted bg-background-secondary"
-              style={{ marginLeft: -12 }}
-            >
-              <Plus size={18} color={colors.text.muted} />
+            <TouchableOpacity onPress={handleJoinAction} activeOpacity={0.8}>
+              <LinearGradient colors={[colors.accent.pink, colors.accent.pinkDark]} style={{ borderRadius: 12, padding: 14, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                <UserPlus size={18} color="#ffffff" />
+                <Text className="text-white font-bold ml-2">Join & Add Friends</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
+        ) : (
+          <View className="gap-4">
+            {localGroups.map((group, index) => {
+              const groupStreak = group.members && group.members.length > 0 
+                ? Math.min(...group.members.map(m => m.streak || 0)) 
+                : 0;
+              const isExpanded = expandedGroupId === group.id;
 
-          <View className="ml-4 flex-1">
-            <Text className="text-foreground-muted text-sm">
-              {groupMembers.length} members saving
-            </Text>
-            <Text className="text-foreground font-semibold">RM 8,500 total</Text>
+              return (
+                <View
+                  key={group.id}
+                  className={index > 0 ? "pt-5 border-t border-white/5" : ""}
+                >
+                  <View className="flex-row justify-between mb-4">
+                    <View>
+                      <Text className="text-foreground-secondary text-[10px] uppercase font-bold tracking-widest mb-1">{group.name}</Text>
+                      <Text className="text-foreground text-3xl font-bold">RM {group.balance.toLocaleString()}</Text>
+                    </View>
+                    <View className="bg-accent/20 rounded-full px-3 py-1 flex-row items-center self-start border border-accent/30">
+                      <TrendingUp size={14} color={colors.accent.teal} />
+                      <Text className="text-accent font-bold text-xs ml-1">+0.5% p.a.</Text>
+                    </View>
+                  </View>
+
+                  {/* Group Streak Progress Bar & Dropdown */}
+                  <View className="mb-5 bg-background p-3 rounded-2xl border border-border/50">
+                    <TouchableOpacity 
+                      onPress={() => toggleDropdown(group.id)}
+                      activeOpacity={0.7}
+                      className="flex-row justify-between items-center mb-2"
+                    >
+                      <Text className="text-foreground font-semibold text-sm">Squad Streak: {groupStreak} Days</Text>
+                      <View className="flex-row items-center">
+                        <Text className="text-accent font-bold text-xs mr-2">10 Days to Reward</Text>
+                        {isExpanded ? (
+                           <ChevronUp size={16} color={colors.text.muted} />
+                        ) : (
+                           <ChevronDown size={16} color={colors.text.muted} />
+                        )}
+                      </View>
+                    </TouchableOpacity>
+
+                    <View className="h-2 w-full bg-background-cardLight rounded-full overflow-hidden mb-2">
+                      <View className="h-full bg-accent rounded-full" style={{ width: `${Math.min((groupStreak / 10) * 100, 100)}%` }} />
+                    </View>
+
+                    {/* Expandable Teammate Breakdown */}
+                    {isExpanded && (
+                      <View className="pt-3 pb-1 border-t border-border/30 mt-3">
+                        {group.members?.map(member => {
+                          const streak = member.streak || 0;
+                          const maxStreakForScale = Math.max(15, ...(group.members.map(m => m.streak || 0)));
+                          const widthPercent = Math.min((streak / maxStreakForScale) * 100, 100);
+                          
+                          // 🔥 Fixed typing for barColor
+                          let barColor: string = colors.accent.pink; 
+                          if (streak >= 10) barColor = "#f59e0b"; // Orange/Amber
+                          else if (streak >= 5) barColor = colors.accent.teal; // Teal
+
+                          return (
+                            <View key={member.id} className="mb-3">
+                              <View className="flex-row justify-between items-center mb-1.5">
+                                <View className="flex-row items-center">
+                                  <View className="w-5 h-5 rounded-full items-center justify-center mr-2 border border-white/10" style={{ backgroundColor: member.color + '30' }}>
+                                    <Text style={{ color: member.color, fontSize: 9, fontWeight: 'bold' }}>{member.initials}</Text>
+                                  </View>
+                                  <Text className="text-foreground-muted text-xs">{member.name}</Text>
+                                </View>
+                                <Text className="text-xs font-bold" style={{ color: barColor }}>
+                                  {streak} Days
+                                </Text>
+                              </View>
+                              <View className="h-1.5 w-full bg-background-cardLight rounded-full overflow-hidden">
+                                <View className="h-full rounded-full" style={{ width: `${widthPercent}%`, backgroundColor: barColor }} />
+                              </View>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    )}
+
+                    <Text className="text-foreground-muted text-[10px] leading-4 italic mt-1">
+                      Keep on working up on personal saving to continue the group streak!
+                    </Text>
+                  </View>
+
+                  <View className="flex-row gap-3">
+                    <TouchableOpacity
+                      onPress={() => handleGroupPress(group.id, group.name)}
+                      activeOpacity={0.7}
+                      className="flex-1 bg-background-cardLight py-2.5 rounded-xl items-center justify-center border border-border"
+                    >
+                      <Text className="text-foreground font-semibold text-sm">Squad Chat</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => openTopUpModal(group.id)}
+                      activeOpacity={0.7}
+                      className="flex-1 bg-accent py-2.5 rounded-xl items-center justify-center flex-row shadow-lg shadow-accent/30"
+                    >
+                      <PlusCircle size={16} color="#ffffff" />
+                      <Text className="text-white font-semibold text-sm ml-1.5">Top Up</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </LinearGradient>
+
+      {/* Top Up Modal */}
+      <Modal visible={topUpModalVisible} transparent={true} animationType="slide">
+        <View className="flex-1 justify-end bg-black/60">
+          <View className="bg-background-card rounded-t-[32px] p-6 border-t border-accent/20">
+
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-foreground font-bold text-xl">Top Up Squad Pocket</Text>
+              <TouchableOpacity onPress={() => setTopUpModalVisible(false)} className="bg-background-cardLight rounded-full p-2">
+                <Text className="text-foreground-muted font-bold text-sm">✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-4 mb-6 flex-row items-center">
+              <View className="w-10 h-10 bg-purple-500/20 rounded-full items-center justify-center mr-3">
+                <ShieldCheck size={20} color="#a855f7" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-purple-400 font-bold text-sm">GXBank Savings Pocket</Text>
+                <Text className="text-foreground-muted text-xs mt-1 leading-4">
+                  Your funds are secure and actively earning <Text className="text-foreground font-semibold">2.00% + 0.50% (Group Rewards) p.a. daily interest</Text>.
+                </Text>
+              </View>
+            </View>
+
+            <Text className="text-foreground font-semibold mb-3">Quick Amount</Text>
+            <View className="flex-row gap-3 mb-8">
+              {[10, 50, 100].map(amount => (
+                <TouchableOpacity
+                  key={amount}
+                  onPress={() => handleTopUpConfirm(amount)}
+                  className="flex-1 bg-background-cardLight border border-border py-4 rounded-xl items-center active:bg-accent/20"
+                >
+                  <Text className="text-foreground font-bold text-lg">RM {amount}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              onPress={() => setTopUpModalVisible(false)}
+              className="w-full py-4 rounded-xl items-center mb-4"
+            >
+              <Text className="text-foreground-muted font-bold">Cancel</Text>
+            </TouchableOpacity>
+
           </View>
         </View>
+      </Modal>
 
-        {/* Member names */}
-        <View className="flex-row flex-wrap gap-2 mb-4">
-          {groupMembers.map((member) => (
-            <View
-              key={member.id}
-              className="bg-background-secondary rounded-full px-3 py-1"
-            >
-              <Text className="text-foreground-muted text-xs">{member.name}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Join button */}
-        <TouchableOpacity onPress={onJoin} activeOpacity={0.8}>
-          <LinearGradient
-            colors={[colors.accent.pink, colors.accent.pinkDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{
-              borderRadius: 12,
-              padding: 14,
-              alignItems: "center",
-            }}
-          >
-            <Text className="text-white font-bold">Join Group Challenge</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        {/* Info text */}
-        <Text className="text-foreground-muted text-xs text-center mt-3">
-          Earn bonus interest when you save together!
-        </Text>
-      </LinearGradient>
     </View>
   );
 }

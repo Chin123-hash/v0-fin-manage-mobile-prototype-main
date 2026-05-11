@@ -1,136 +1,97 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  ArrowRightLeft,
-  CreditCard,
-  PlusCircle,
-  Scan,
-  Bell,
-  Eye,
-  EyeOff,
+import { 
+  Bell, Eye, EyeOff, ChevronRight, Archive, Zap, PlusCircle 
 } from "lucide-react-native";
-import { userProfile, formatRM } from "@/lib/mock-data";
+import { userProfile, formatRM, mentalAccounts } from "@/lib/mock-data";
 import { colors } from "@/lib/constants";
-
-const quickActions = [
-  { id: "transfer", label: "Transfer", Icon: ArrowRightLeft },
-  { id: "pay", label: "Pay", Icon: CreditCard },
-  { id: "top-up", label: "Top Up", Icon: PlusCircle },
-  { id: "scan", label: "Scan", Icon: Scan },
-];
+import { useRouter } from "expo-router";
+import { MentalAccounts } from "@/components/fin-manage/MentalAccounts";
 
 export default function HomeScreen() {
   const [showBalance, setShowBalance] = React.useState(true);
+  const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-4">
-        <View>
-          <Text className="text-foreground-muted text-sm">Good evening,</Text>
-          <Text className="text-foreground font-bold text-xl">
-            {userProfile.name}
-          </Text>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        {/* Header */}
+        <View className="flex-row items-center justify-between px-6 py-4">
+          <View>
+            <Text className="text-foreground-muted text-xs uppercase tracking-widest mb-1">Welcome back</Text>
+            <Text className="text-foreground font-bold text-2xl">{userProfile.name}</Text>
+          </View>
+          <TouchableOpacity className="w-10 h-10 rounded-full bg-background-card items-center justify-center border border-background-cardLight">
+            <Bell size={20} color={colors.text.primary} />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity className="w-10 h-10 rounded-full bg-background-card items-center justify-center">
-          <Bell size={20} color={colors.text.primary} />
-        </TouchableOpacity>
-      </View>
 
-      {/* Balance Card */}
-      <View className="mx-4 mb-6">
-        <LinearGradient
-          colors={[colors.background.secondary, colors.background.card]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{
-            borderRadius: 20,
-            padding: 24,
-            borderWidth: 1,
-            borderColor: colors.background.cardLight,
-          }}
-        >
-          <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-foreground-muted text-sm">Total Balance</Text>
-            <TouchableOpacity onPress={() => setShowBalance(!showBalance)}>
-              {showBalance ? (
-                <Eye size={20} color={colors.text.muted} />
-              ) : (
-                <EyeOff size={20} color={colors.text.muted} />
-              )}
+        {/* 1. NATIVE LAYER: GX Account & Daily Interest */}
+        <View className="px-6 mb-8">
+          <LinearGradient
+            colors={[colors.background.secondary, colors.background.primary]}
+            style={{ borderRadius: 24, padding: 24, borderWidth: 1, borderColor: colors.background.cardLight }}
+          >
+            <View className="flex-row items-center justify-between mb-4">
+              <Text className="text-foreground-muted text-sm font-medium">Main Account</Text>
+              <TouchableOpacity onPress={() => setShowBalance(!showBalance)}>
+                {showBalance ? <Eye size={20} color={colors.accent.teal} /> : <EyeOff size={20} color={colors.accent.teal} />}
+              </TouchableOpacity>
+            </View>
+            <Text className="text-foreground font-bold text-4xl mb-2">
+              {showBalance ? formatRM(userProfile.totalBalance) : "RM ****.**"}
+            </Text>
+            <View className="flex-row items-center">
+              <Text className="text-foreground-muted text-xs mr-2">{userProfile.accountNumber}</Text>
+              <View className="bg-teal/20 px-2 py-0.5 rounded">
+                <Text className="text-accent text-[10px] font-bold">3.0% DAILY INT.</Text>
+              </View>
+            </View>
+          </LinearGradient>
+        </View>
+
+        {/* 2. NATIVE LAYER: Savings Pockets (Minimalist List) */}
+        <View className="px-6 mb-8">
+          <View className="flex-row items-center justify-between mb-4">
+            <Text className="text-foreground font-bold text-lg">Savings Pockets</Text>
+            <TouchableOpacity className="flex-row items-center">
+              <PlusCircle size={20} color={colors.accent.teal} />
             </TouchableOpacity>
           </View>
-
-          <Text className="text-foreground font-bold text-4xl mb-1">
-            {showBalance ? formatRM(userProfile.totalBalance) : "RM ****.**"}
-          </Text>
-
-          <Text className="text-foreground-muted text-sm">
-            Account: {userProfile.accountNumber}
-          </Text>
-
-          {/* GX Bank branding accent */}
-          <View className="absolute top-4 right-4 w-16 h-16 rounded-full bg-accent/10" />
-          <View className="absolute top-8 right-8 w-8 h-8 rounded-full bg-pink/10" />
-        </LinearGradient>
-      </View>
-
-      {/* Quick Actions */}
-      <View className="mx-4 mb-6">
-        <Text className="text-foreground font-semibold text-base mb-4">
-          Quick Actions
-        </Text>
-        <View className="flex-row justify-between">
-          {quickActions.map((action) => (
-            <TouchableOpacity
-              key={action.id}
-              className="items-center"
-              activeOpacity={0.7}
-            >
-              <LinearGradient
-                colors={[colors.background.card, colors.background.secondary]}
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: 16,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 8,
-                }}
-              >
-                <action.Icon size={24} color={colors.accent.teal} />
-              </LinearGradient>
-              <Text className="text-foreground-muted text-xs">{action.label}</Text>
-            </TouchableOpacity>
-          ))}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-6 px-6">
+            <View className="flex-row">
+              {["Emergency", "Travel", "Taxes"].map((pocket, i) => (
+                <View key={i} className="bg-background-card px-4 py-3 rounded-2xl mr-3 border border-background-cardLight min-w-[120px]">
+                  <Archive size={16} color={colors.accent.teal} className="mb-2" />
+                  <Text className="text-foreground font-bold text-xs">{pocket}</Text>
+                  <Text className="text-foreground-muted text-[10px]">RM 1,200.00</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
         </View>
-      </View>
 
-      {/* Promo Banner */}
-      <View className="mx-4">
-        <LinearGradient
-          colors={[colors.accent.teal, colors.accent.tealDark]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={{
-            borderRadius: 16,
-            padding: 20,
-          }}
-        >
-          <Text className="text-white font-bold text-lg mb-1">
-            Fin Manage is here!
-          </Text>
-          <Text className="text-white/80 text-sm mb-3">
-            Level up your savings with gamification, AI insights, and earn
-            rewards for your digital pet!
-          </Text>
-          <TouchableOpacity className="bg-white/20 self-start px-4 py-2 rounded-full">
-            <Text className="text-white font-semibold">Explore Now</Text>
+
+
+        {/* Active Habit-Builder Nudge */}
+        <View className="px-6">
+          <TouchableOpacity 
+            className="bg-accent/10 border border-accent/20 rounded-2xl p-5 flex-row items-center"
+            onPress={() => router.push("/fin-manage")}
+          >
+            <View className="w-12 h-12 rounded-full bg-accent items-center justify-center mr-4">
+              <Zap size={24} color={colors.background.primary} />
+            </View>
+            <View className="flex-1">
+              <Text className="text-foreground font-bold text-base">Fin Manage Ecosystem</Text>
+              <Text className="text-foreground-muted text-xs">Feed your fish by reaching saving milestones.</Text>
+            </View>
+            <ChevronRight size={20} color={colors.text.muted} />
           </TouchableOpacity>
-        </LinearGradient>
-      </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

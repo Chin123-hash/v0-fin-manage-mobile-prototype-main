@@ -1,18 +1,19 @@
+// app/saving-plan.tsx
 import React, { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { X, Check, Sparkles } from "lucide-react-native";
+import { X, Check, Sparkles, ShieldCheck } from "lucide-react-native";
 import { MicroSavingChips } from "@/components/saving-plan/MicroSavingChips";
 import { FutureSavingLogic } from "@/components/saving-plan/FutureSavingLogic";
-import { GroupSavingCard } from "@/components/saving-plan/GroupSavingCard";
+// Removed GroupSavingCard import
 import { colors } from "@/lib/constants";
+import { appState } from "@/lib/mock-data";
 
 export default function SavingPlanScreen() {
   const router = useRouter();
 
-  // State for saving plan options
   const [selectedMicroAmount, setSelectedMicroAmount] = useState<number | null>(10);
   const [saveAmount, setSaveAmount] = useState(10);
   const [triggerAmount, setTriggerAmount] = useState(100);
@@ -22,28 +23,26 @@ export default function SavingPlanScreen() {
   };
 
   const handleActivate = () => {
+    // Update the personal plan flag
+    appState.isPersonalPlanActive = true;
+    appState.activePlan = {
+      microSavingAmount: selectedMicroAmount || 10,
+      autoSaveAmount: saveAmount,
+      autoSaveTrigger: triggerAmount,
+    };
+
     Alert.alert(
       "Saving Plan Activated!",
-      `Your smart saving rules are now active:\n\n- Micro-save: RM${selectedMicroAmount || 0}/day\n- Auto-save: RM${saveAmount} per RM${triggerAmount} deposit`,
+      "Your rewards are ready. Check your dashboard!",
       [
         {
           text: "Awesome!",
-          onPress: handleClose,
+          onPress: () => router.back(), // Navigates back to trigger refresh logic
         },
       ]
     );
   };
-
-  const handleJoinGroup = () => {
-    Alert.alert(
-      "Join Group Challenge",
-      "You'll be joining the Japan Trip Squad! Save together and earn +0.5% p.a. bonus interest.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Join", onPress: () => {} },
-      ]
-    );
-  };
+  // Removed handleJoinGroup function
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top", "bottom"]}>
@@ -62,7 +61,6 @@ export default function SavingPlanScreen() {
             Setup Saving Plan
           </Text>
         </View>
-
         <View className="w-10" />
       </View>
 
@@ -71,30 +69,37 @@ export default function SavingPlanScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
       >
-        {/* Intro text */}
-        <View className="mb-6">
+        <View className="mb-4">
           <Text className="text-foreground-muted text-center">
             Create smart saving habits with automated rules. Every small step
             counts towards your goals!
           </Text>
         </View>
 
-        {/* Micro-Saving Chips */}
+        {/* 🔥 GXBank Promo Banner */}
+        <View className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-4 mb-6 flex-row items-center">
+          <View className="w-10 h-10 bg-purple-500/20 rounded-full items-center justify-center mr-3">
+            <ShieldCheck size={20} color="#a855f7" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-purple-400 font-bold text-sm">Powered by GXBank</Text>
+            <Text className="text-foreground-muted text-xs mt-1 leading-4">
+              Your automated savings go to a secure Save Pocket earning <Text className="text-foreground font-semibold">2.00% p.a. daily interest</Text>.
+            </Text>
+          </View>
+        </View>
+
         <MicroSavingChips
           selectedAmount={selectedMicroAmount}
           onSelect={setSelectedMicroAmount}
         />
 
-        {/* Future Saving Logic */}
         <FutureSavingLogic
           saveAmount={saveAmount}
           triggerAmount={triggerAmount}
           onSaveAmountChange={setSaveAmount}
           onTriggerAmountChange={setTriggerAmount}
         />
-
-        {/* Group Saving */}
-        <GroupSavingCard onJoin={handleJoinGroup} />
 
         {/* Summary */}
         <View className="bg-background-card rounded-xl p-4 mb-4">
